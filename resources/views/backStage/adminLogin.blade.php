@@ -36,13 +36,13 @@
 						<img src="{{asset('assets/images/icons/user.png')}}" class="mt-5" width="120" alt="" />
 					</div>
 					<p class="mt-2 text-white fs-3">管理平台登入</p>
-					<form action="{{route('accountVerify')}}" method="POST">
+					<form action="{{route('view.backStage.adminLogin')}}" method="POST">
 						@csrf
 						<div class="mb-3 mt-3">
-							<input type="account" name="account" class="form-control" placeholder="輸入帳號" required="required" autocomplete="off" />
+							<input type="account" name="account" class="form-control" placeholder="輸入帳號" required="required" autocomplete="off" value="admin01" />
 						</div>
 						<div class="mb-3 mt-3">
-							<input type="password" name="password" class="form-control" placeholder="輸入密碼" required="required" autocomplete="off" />
+							<input type="password" name="password" class="form-control" placeholder="輸入密碼" required="required" autocomplete="off" value="admin01"/>
 						</div>
 						<div class="d-grid">
 							<button type="submit" class="btn btn-white">登入</button>
