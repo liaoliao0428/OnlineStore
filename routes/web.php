@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 
+/************************************ backStage API Contorller************************************ */
+use App\Http\Controllers\Admin\AdminController;
+/************************************ backStage API Contorller************************************ */
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,4 +19,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+/************************************ backStage Web Route************************************ */
+Route::prefix('admin')->group(function () {
+    //後台登入畫面
+    Route::get('/login', function () {
+        return view('backStage.adminLogin');
+    });
+    //驗證accessToken
+    Route::post('/verify', [App\Http\Controllers\Admin\AdminController::class, 'accountVerify'])->name('accountVerify');
 });
