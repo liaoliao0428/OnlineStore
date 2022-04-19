@@ -61,7 +61,7 @@
                     </a>
                     <ul>
                         <li><a href=""><i class="bx bx-right-arrow-alt"></i>商品分類管理</a></li>
-                        <li><a href=""><i class="bx bx-right-arrow-alt"></i>商品管理</a></li>
+                        <li><a href="{{route('productIndex')}}"><i class="bx bx-right-arrow-alt"></i>商品管理</a></li>
                     </ul>
                 </li>
                 <li>
