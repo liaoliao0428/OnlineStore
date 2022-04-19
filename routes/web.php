@@ -2,9 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 
-/************************************ backStage API Contorller************************************ */
+/************************************ backStage Contorller************************************ */
 use App\Http\Controllers\Admin\AdminController;
-/************************************ backStage API Contorller************************************ */
+use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Category\CategoryController;
+/************************************ backStage Contorller************************************ */
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +24,7 @@ Route::get('/', function () {
 });
 
 /************************************ backStage Web Route************************************ */
+// 管理者
 Route::prefix('admin')->group(function () {
     //後台登入畫面
     Route::get('/login', function () {
@@ -36,4 +39,10 @@ Route::prefix('admin')->group(function () {
 
     //登出
     Route::get('/logout', [App\Http\Controllers\Admin\AdminController::class, 'logout'])->name('adimnLogout');
+});
+
+// 商品
+Route::prefix('product')->group(function () {
+    //首頁
+    Route::get('/index', [App\Http\Controllers\Product\ProductController::class, 'index'])->name('productIndex');
 });

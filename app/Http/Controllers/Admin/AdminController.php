@@ -7,16 +7,25 @@ use App\Http\Controllers\Controller;
 use App\Models\AdminModel;
 use App\Http\Traits\ToolTrait;
 use Illuminate\Support\Facades\Cookie;
-// use App\Models\modelName;
 
 class AdminController extends Controller
 {
     use ToolTrait;
-    //建構子 middle設定
+    //建構子 middleware設定
     public function __construct()
     {
         $this->middleware('authCheck')->except('login','generateToken');
-    }   
+    }
+    
+    /*********************************************view************************************************ */
+    //首頁畫面
+    public function index()
+    {  
+        return view('backstage.index'); //有帳號無token 代表帳號正卻，產生新token 存入資料庫跟session
+    }
+    /*********************************************view************************************************ */
+    
+    
 
     /********************************************* 登入驗證 Encryption加密************************************************ */
     // 登入驗證 Encryption加密
@@ -67,13 +76,7 @@ class AdminController extends Controller
         $token = md5($tokenUnEncryption);
         return $token;
     }
-    /********************************************* 登入驗證 Encryption加密************************************************ */
-
-    //首頁畫面
-    public function index()
-    {  
-        return view('backstage.index'); //有帳號無token 代表帳號正卻，產生新token 存入資料庫跟session
-    }
+    /********************************************* 登入驗證 Encryption加密************************************************ */    
 
     //登出 
     public function logout()

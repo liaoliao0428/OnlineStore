@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 /************************************ backStage API Contorller************************************ */
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Category\CategoryController;
 /************************************ backStage API Contorller************************************ */
 
 
@@ -24,20 +26,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Route::prefix('admin')->group(function () {
-//     //產生作廢發票0501_xml
-//     Route::post('/login', [App\Http\Controllers\Admin\AdminController::class, 'generate_C0501_xml_data'])->name('generate_C0501_xml_data');
-// });
-
-// Route::middleware(['api', 'cors'])->prefix('admin')->group(function () {
-//     //產生作廢發票0501_xml
-//     Route::post('/login', [App\Http\Controllers\Admin\AdminController::class, 'generate_C0501_xml_data'])->name('generate_C0501_xml_data');
-// });
-
-// Route::group([
-//     'middleware' => ['api', 'cors'],
-//     'prefix' => 'api',
-// ], function ($router) {
-//      // some code here
-// });
+/***************************************category************************************* */
+Route::prefix('category')->group(function () {
+    //產生作廢發票0501_xml
+    Route::post('/all', [App\Http\Controllers\Category\CategoryController::class, 'categoryAll'])->name('categoryAll');
+});
 
