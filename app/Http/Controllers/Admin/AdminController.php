@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\AdminModel;
 use App\Http\Traits\ToolTrait;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Session;
+
 
 class AdminController extends Controller
 {
@@ -62,7 +64,8 @@ class AdminController extends Controller
             Cookie::queue('adminName', $adminName, 1800);
             Cookie::queue('adminId', $adminId, 1800);
 
-            $this->talk('',route('adimnIndex'),2);   //跳至首頁
+            //轉址到首頁
+            return redirect()->route('adimnIndex');
         } else {    //不正確跳回登入頁面
             $this->talk('帳號或密碼有誤!',route('view.backStage.adminLogin'),3);   //跳轉回登入頁面
         }

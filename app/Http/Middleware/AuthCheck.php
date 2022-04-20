@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Session;
 use App\Http\Traits\ToolTrait;
 
 
@@ -21,11 +22,13 @@ class AuthCheck
      */
     public function handle(Request $request, Closure $next)
     {
+        $sessionAccessToken = Session::get('accessToken');
         $cookieAccessToken = Cookie::get('accessToken');
-        $sessionAccessToken = session('accessToken', 'default');
-        if($cookieAccessToken != $sessionAccessToken){
+
+        if($sessionAccessToken == $cookieAccessToken){
+            return $next($request);
+        }else{
             $this->talk('權限錯誤',route('view.backStage.adminLogin'),3);   //跳轉回登入頁面
         }
-        return $next($request);
     }
 }

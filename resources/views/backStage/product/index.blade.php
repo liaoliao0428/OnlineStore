@@ -22,9 +22,6 @@
         <div class="col-4 row">
             <div class="col-6">
                 <select class="form-select radius-30 " name="category" id="category" onchange=changeSize()>
-                    <option value="1">分類1</option>
-                    <option value="2">分類2</option>
-                    <option value="3">分類3</option>
                 </select>
             </div>
         </div>
@@ -35,7 +32,7 @@
     
     <div class="card">
         <div class="card-body ">
-            <table class="table table-bordered mb-0" id="banner">
+            <table class="table table-bordered mb-0" id="product">
             </table>
         </div>
     </div>
@@ -46,8 +43,37 @@
 @section('script')
 
 <script>
-    // let category = await axios.post("{{route('categoryAll')}}");
-    // console.log(category);
+    /**************************************抓分類************************************ */
+    // 撈全部分類
+    const getAllCategory = async() => {
+        let response = await axios.post("{{route('categoryAll')}}");
+        return response.data.category
+    }
+
+    //組合分類selectHtml
+    const categoryHtml = async() => {
+        let category = await getAllCategory()
+        let html = `<option value="">選擇商品分類</option>`
+        category.forEach((category,$key) => {
+            html += `<option value="${category.categoryId}">${category.categoryName}</option>`
+        });
+        return html
+    }
+
+    // categoryHtml 塞入select
+    const categoryHtmlInsert = async() => {
+        let category = await categoryHtml()
+        $('select#category').html(category) //把banner指定給這個function
+    }
+
+    // 分類html塞入select
+    categoryHtmlInsert()
+    /**************************************抓分類************************************ */
+
+
+
+
+    
 </script>
 
 @endsection
