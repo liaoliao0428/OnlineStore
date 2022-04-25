@@ -31,4 +31,18 @@ Route::prefix('category')->group(function () {
     //產生作廢發票0501_xml
     Route::post('/all', [App\Http\Controllers\Category\CategoryController::class, 'categoryAll'])->name('categoryAll');
 });
+/***************************************category************************************* */
+
+
+/***************************************product************************************* */
+
+// 商品
+Route::prefix('product')->group(function () {
+    // 取得商品
+    Route::post('/', [App\Http\Controllers\Product\ProductController::class, 'product'])->name('product');
+    // 更新
+    Route::post('/update', [App\Http\Controllers\Product\ProductController::class, 'update'])->name('productUpdate');
+});
+/***************************************product************************************* */
+
 

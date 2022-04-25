@@ -48,5 +48,7 @@ Route::prefix('product')->group(function () {
     //新增頁
     Route::get('/add/{categoryId}', [App\Http\Controllers\Product\ProductController::class, 'add'])->name('productAdd');
     // 編輯頁
-    Route::get('/edit/{categoryId}', [App\Http\Controllers\Product\ProductController::class, 'edit'])->name('productEdit');
+    Route::get('/edit/{productId}', [App\Http\Controllers\Product\ProductController::class, 'edit'])->name('productEdit');
+    // 商品新增寫入
+    Route::post('/insert', [App\Http\Controllers\Product\ProductController::class, 'insert'])->name('productInsert');
 });

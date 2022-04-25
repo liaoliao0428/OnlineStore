@@ -74,8 +74,9 @@ class AdminController extends Controller
     //產生新token Encryption加密
     public function generateToken($account)
     {
-        $randomString = $this->randomString(32);
-        $tokenUnEncryption = time() . $account . $randomString;
+        //產生一個16進制安全隨機字串
+        $bin2hex = $this->bin2hex(32);
+        $tokenUnEncryption = time() . $account . $bin2hex;
         $token = md5($tokenUnEncryption);
         return $token;
     }
