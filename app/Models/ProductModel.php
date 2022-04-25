@@ -24,15 +24,39 @@ class Product extends Model
         'productId',
         'productName',
         'categoryId',
-        'describtion',
+        'description',
     ];
 }
 
-class ProductModel extends Model
+class ProductModel 
 {
-    //取得商品
+    // 取得全部商品
+    public static function select_product_db()
+    {
+        return DB::select("SELECT * FROM product");
+    }
+
+    // 取得指定分類商品
     public static function select_product_with_categoryId_db($categoryId)
     {
-        return DB::select("SELECT * FROM product WHERE categoryId = $categoryId");
+        return DB::select("SELECT * FROM product WHERE categoryId = '$categoryId'");
+    }
+
+    // 取得指定商品
+    public static function select_product_with_productId_db($productId)
+    {
+        return DB::select("SELECT * FROM product WHERE productId = '$productId'");
+    }
+
+    // 商品新增寫入
+    public static function insert_product_db($product)
+    {
+        Product::create($product);
+    }
+
+    // 商品更新
+    public static function update_product_db($productId,$product)
+    {
+        Product::where('productId',$productId)->update($product);
     }
 }

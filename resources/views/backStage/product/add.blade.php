@@ -18,38 +18,28 @@
         </div>
     </div>
     <hr />
-    <!--breadcrumb-->
-    <!-- <div class="row">
-        <div class="col-4 row">
-            <div class="col-6">
-                <select class="form-select radius-30 " name="category" id="category" onchange=changeSize()>
-                </select>
-            </div>
-        </div>
-        <div class="col-8 text-end">
-            <a href="" type="button" class="btn btn-outline-secondary px-5 mb-3 radius-30"><i class='bx bx-cloud-upload mr-1'></i>新增商品</a>
-        </div>
-    </div> -->
     <div class="d-flex justify-content-center">
         <div class="card col-6">
             <div class="card-body">
-                <div class="col-12">
-                    <label for="inputFirstName" class="form-label fs-3">商品名稱</label>
-                    <input type="email" class="form-control" id="inputFirstName">
-                </div>
-                <div class="col-12 mt-3">
-                    <label for="inputLastName" class="form-label fs-3">商品分類</label>
-                    <select class="form-select" name="category" id="category" onchange=changeSize()>
-                        <option value="United States">United States</option>
-                    </select>
-                </div>
-                <div class="col-12 mt-3">
-                    <label for="inputEmail" class="form-label fs-3">商品描述</label>
-                    <textarea  type="textarea" class="form-control" id="inputEmail"></textarea>
-                </div>
-                <div class="col-12 d-flex align-items-end justify-content-center mt-4">
-                    <a href="{{route('productEdit',['categoryId'=>0])}}" type="button" class="btn btn-outline-success px-5 "><i class='bx bx-cloud-upload mr-1'></i>送出</a>
-                </div>
+                <form action="{{route('productInsert')}}" method="POST" onsubmit="return productSubmitCheck()">
+                    @csrf
+                    <div class="col-12">
+                        <label for="productName" class="form-label fs-3">商品名稱</label>
+                        <input name="productName" id="productName" class="form-control" required>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <label for="category" class="form-label fs-3">商品分類</label>
+                        <select name="categoryId" id="category" class="form-select">
+                        </select>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <label for="description" class="form-label fs-3">商品描述</label>
+                        <textarea name="description" id="inputEmail" type="textarea" class="form-control" ></textarea>
+                    </div>
+                    <div class="col-12 d-flex align-items-end justify-content-center mt-4">
+                        <input type="submit" value="新增商品" class="btn btn-outline-success px-5 ">
+                    </div>
+                </form>
             </div>
         </div>
     </div>    
@@ -60,19 +50,28 @@
 @section('script')
 
 <script>
-    /**************************************抓分類************************************ */
+    // 從網址取得當前分類id
+    const getCategoryIdFromUrl = async () => {
+        let url = location.pathname
+        let splitUrl = url.split("/");
+        let categoryId = splitUrl[5]
+        return categoryId
+    } 
+
+    /**************************************抓所有分類************************************ */
     // 撈全部分類
     const getAllCategory = async () => {
         let response = await axios.post("{{route('categoryAll')}}");
         return response.data.category
     }
 
-    //組合分類selectHtml
+    // 組合分類selectHtml
     const categoryHtml = async () => {
         let category = await getAllCategory()
-        let html = `<option value="">選擇商品分類</option>`
+        let html = `<option value="0">選擇商品分類</option>`
+        let categoryId = await getCategoryIdFromUrl() // 從網址取得現在categoryId
         category.forEach((category, $key) => {
-            html += `<option value="${category.categoryId}">${category.categoryName}</option>`
+            html += categoryId == category.categoryId ? `<option selected value="${category.categoryId}">${category.categoryName}</option>` : `<option value="${category.categoryId}">${category.categoryName}</option>`
         });
         return html
     }
@@ -82,10 +81,21 @@
         let category = await categoryHtml()
         $('select#category').html(category) //把banner指定給這個function
     }
-
+    
     // 分類html塞入select
     categoryHtmlInsert()
-    /**************************************抓分類************************************ */
+    /**************************************抓所有分類************************************ */
+
+    // 商品新增送出檢查
+    const productSubmitCheck = () => {
+        let categoryId = $('select#category').val()
+        if(categoryId == 0){
+            alert("請選擇正確分類")
+            return false
+        }
+    }
+
+
 </script>
 
 @endsection

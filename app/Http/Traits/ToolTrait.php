@@ -21,10 +21,21 @@ trait ToolTrait
 
     /*********************************隨機字串"****************************************** */
     //隨機字串
-    public function randomString($i)
+    public function bin2hex($i)
     {
-        $randomString = bin2hex(random_bytes($i));
-        return $randomString;
+        $bin2hex = bin2hex(random_bytes($i));
+        return $bin2hex;
+    }
+
+    function randomString($length){
+        $rand_string = '';
+        for($i = 0; $i < $length; $i++) {
+            $number = random_int(0, 36);
+            $character = base_convert($number, 10, 36);
+            $rand_string .= $character;
+        }
+     
+        return $rand_string;      
     }
     /*********************************隨機字串"****************************************** */
 

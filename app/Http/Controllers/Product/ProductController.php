@@ -36,9 +36,8 @@ class ProductController extends Controller
     }
 
     // 編輯商品畫面
-    public function edit($categoryId = 0)
+    public function edit($productId = 0)
     {  
-        Cookie::queue('categoryId', $categoryId, 1800);
         return view('backstage.product.edit'); 
     }
     /*********************************************view************************************************ */
@@ -47,13 +46,46 @@ class ProductController extends Controller
     public function product(Request $request)
     {
         $categoryId = $request->categoryId;
-        $product = ProductModel::select_product_with_categoryId_db($categoryId);
+        $productId = $request->productId;
+
+        // 撈指定分類商品
+        if($categoryId == 0){   // categoryId != 0 撈全部
+            $product = ProductModel::select_product_db();
+        }else{
+            $product = ProductModel::select_product_with_categoryId_db($categoryId);
+        }
+
+        // 如果有productId 就撈指定的
+        if(!empty($productId)){
+            $product = ProductModel::select_product_with_productId_db($productId);
+        }        
+
+        // 回傳資料
         if(!empty($product)){
             return response()->json(['product' => $product], Response::HTTP_OK);
         }else{
             return response()->json(['product' => '無資料'], Response::HTTP_OK);
         }
         
+    }
+
+    //商品新增
+    public function insert(Request $request)
+    {
+        $product = $request->all();
+        unset($product['_token']);
+        $product['productId'] = $this->randomString(13);
+        ProductModel::insert_product_db($product);
+        return redirect()->route('productEdit',['productId'=>$product['productId']]);
+    }
+
+    //商品更新
+    public function update(Request $request)
+    {
+        $product = $request->all();
+        $productId = $request->productId;
+        ProductModel::update_product_db($productId,$product);
+        return response()->json(['message' => "更新成功"], Response::HTTP_OK);
     }
 
 }
