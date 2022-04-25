@@ -23,7 +23,7 @@
 	<link rel="stylesheet" href="{{asset('assets/css/dark-theme.css')}}" />
 	<link rel="stylesheet" href="{{asset('assets/css/semi-dark.css')}}" />
 	<link rel="stylesheet" href="{{asset('assets/css/header-colors.css')}}" />
-	<title>XXX商城管理平台登入</title>
+	<title>XXX商城管理平台</title>
     @yield('head')
 </head>
 
@@ -61,7 +61,7 @@
                     </a>
                     <ul>
                         <li><a href=""><i class="bx bx-right-arrow-alt"></i>商品分類管理</a></li>
-                        <li><a href="{{route('productIndex')}}"><i class="bx bx-right-arrow-alt"></i>商品管理</a></li>
+                        <li><a href="{{route('productIndex',['categoryId'=>0])}}"><i class="bx bx-right-arrow-alt"></i>商品管理</a></li>
                     </ul>
                 </li>
                 <li>
