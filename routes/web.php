@@ -44,5 +44,9 @@ Route::prefix('admin')->group(function () {
 // 商品
 Route::prefix('product')->group(function () {
     //首頁
-    Route::get('/index', [App\Http\Controllers\Product\ProductController::class, 'index'])->name('productIndex');
+    Route::get('/index/{categoryId}', [App\Http\Controllers\Product\ProductController::class, 'index'])->name('productIndex');
+    //新增頁
+    Route::get('/add/{categoryId}', [App\Http\Controllers\Product\ProductController::class, 'add'])->name('productAdd');
+    // 編輯頁
+    Route::get('/edit/{categoryId}', [App\Http\Controllers\Product\ProductController::class, 'edit'])->name('productEdit');
 });
