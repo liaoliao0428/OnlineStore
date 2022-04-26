@@ -11,7 +11,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
                     <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item"><a href="{{route('productIndex',['categoryId'=>0])}}">商品管理</a></li>
+                    <li class="breadcrumb-item"><a href="javascript:;" onclick="backToProductIndex()">商品管理</a></li>
                     <li class="breadcrumb-item active" aria-current="page">新增商品</li>
                 </ol>
             </nav>
@@ -93,6 +93,14 @@
             alert("請選擇正確分類")
             return false
         }
+    }
+
+    // 回到商品管理頁面
+    const backToProductIndex = async () => {
+        categoryId = await getCategoryIdFromUrl()
+        let url = '{{route("productIndex", ["categoryId"=>":categoryId"])}}';
+        url = url.replace(':categoryId', categoryId)
+        location.href = url;
     }
 
 

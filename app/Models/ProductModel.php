@@ -48,6 +48,12 @@ class ProductModel
         return DB::select("SELECT * FROM product WHERE productId = '$productId'");
     }
 
+    // 取得商品細項
+    public static function select_product_detail_with_productId_db($productId)
+    {
+        return DB::select("SELECT * FROM product_detail WHERE productId = '$productId'");
+    }
+
     // 商品新增寫入
     public static function insert_product_db($product)
     {
@@ -58,5 +64,11 @@ class ProductModel
     public static function update_product_db($productId,$product)
     {
         Product::where('productId',$productId)->update($product);
+    }
+
+    // 商品刪除
+    public static function delete_product_db($productId)
+    {
+        Product::where('productId',$productId)->delete();
     }
 }

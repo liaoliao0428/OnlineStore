@@ -11,7 +11,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0 p-0">
                     <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a></li>
-                    <li class="breadcrumb-item"><a href="{{route('productIndex',['categoryId'=>0])}}">商品管理</a></li>
+                    <li class="breadcrumb-item"><a href="javascript:;" onclick="backToProductIndex()">商品管理</a></li>
                     <li class="breadcrumb-item active" aria-current="page">編輯商品</li>
                 </ol>
             </nav>
@@ -78,7 +78,7 @@
                         </div>
                         <div class="col-12 mt-3">
                             <label for="inputLastName" class="form-label fs-4">商品分類</label>
-                            <select class="form-select" name="category" id="category" onchange=changeSize()>
+                            <select class="form-select" name="category" id="category" >
                                 <option value="United States">United States</option>
                             </select>
                         </div>
@@ -186,6 +186,14 @@
         }else{
             alert("更新失敗")
         }
+    }
+
+    // 回到商品管理頁面
+    const backToProductIndex = async () => {
+        categoryId = $('select#category').val()
+        let url = '{{route("productIndex", ["categoryId"=>":categoryId"])}}';
+        url = url.replace(':categoryId', categoryId)
+        location.href = url;
     }
 
 
