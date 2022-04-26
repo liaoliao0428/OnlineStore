@@ -42,7 +42,7 @@ class ProductController extends Controller
     }
     /*********************************************view************************************************ */
 
-    //取得分類商品
+    //取得商品 有分類取分類 有指定取指定 沒指定拿全部
     public function product(Request $request)
     {
         $categoryId = $request->categoryId;
@@ -50,15 +50,17 @@ class ProductController extends Controller
 
         // 撈指定分類商品
         if($categoryId == 0){   // categoryId != 0 撈全部
-            $product = ProductModel::select_product_db();
+            $productsMain = ProductModel::select_product_db();
         }else{
-            $product = ProductModel::select_product_with_categoryId_db($categoryId);
+            $productsMain = ProductModel::select_product_with_categoryId_db($categoryId);
         }
 
         // 如果有productId 就撈指定的
         if(!empty($productId)){
-            $product = ProductModel::select_product_with_productId_db($productId);
-        }        
+            $productsMain = ProductModel::select_product_with_productId_db($productId);
+        }
+        
+        $product = $this->productArray($productsMain);
 
         // 回傳資料
         if(!empty($product)){
@@ -66,7 +68,21 @@ class ProductController extends Controller
         }else{
             return response()->json(['product' => '無資料'], Response::HTTP_OK);
         }
-        
+    }
+
+    // 商品陣列組合
+    public function productArray($productsMain)
+    {
+        $product = array();
+        foreach($productsMain as $productMain){
+            $productId = $productMain->productId;
+            // 取得商品細項
+            $productDetail = ProductModel::select_product_detail_with_productId_db($productId);
+            // 商品細項塞入商品主檔
+            $productMain->productDetail = $productDetail;
+            $product[] = $productMain;
+        }
+        return $product;
     }
 
     //商品新增
@@ -86,6 +102,14 @@ class ProductController extends Controller
         $productId = $request->productId;
         ProductModel::update_product_db($productId,$product);
         return response()->json(['message' => "更新成功"], Response::HTTP_OK);
+    }
+
+    // 商品刪除
+    public function delete(Request $request)
+    {
+        $productId = $request->productId;
+        ProductModel::delete_product_db($productId);
+        return response()->json(['message' => "刪除成功"], Response::HTTP_OK);
     }
 
 }
