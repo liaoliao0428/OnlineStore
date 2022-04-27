@@ -24,8 +24,10 @@ class Product extends Model
         'productId',
         'productName',
         'categoryId',
-        'description',
+        'description'
     ];
+
+
 }
 
 class ProductModel 
@@ -70,5 +72,11 @@ class ProductModel
     public static function delete_product_db($productId)
     {
         Product::where('productId',$productId)->delete();
+    }
+
+    // 商品上下架
+    public static function update_product_enable_db($productId,$enable)
+    {
+        Product::where('productId',$productId)->update(['enable'=>$enable]);
     }
 }

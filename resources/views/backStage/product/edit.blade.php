@@ -30,15 +30,24 @@
                     </div>
                     <div class="col-12 mt-3">
                         <label for="category" class="form-label fs-4">商品分類</label>
+                        <input type="hidden" name="oldCategory" id="oldCategory">
                         <select name="categoryId" id="category" class="form-select">
                         </select>
                     </div>
-                    <div class="col-12 mt-3">
-                        <label for="description" class="form-label fs-4">商品描述</label>
+                    <div class="col-12 ">
+                        <label for="description" class="form-label fs-4 ">商品描述</label>
                         <textarea id="description" name="description" type="textarea" class="form-control" ></textarea>
                     </div>
-                    <div class="col-12 d-flex align-items-end justify-content-end mt-4">
-                        <button class="btn btn-outline-primary px-5" onclick="updateProduct()"><i class='bx bx-cloud-upload mr-1'></i>更新</button>
+                    <div class="col-12 d-flex mt-4">
+                        <div class="col-8 d-flex">
+                            <label for="description" class="form-label fs-4 m-0 col-3 d-flex align-items-center justify-content-start">上下架</label>
+                            <div class="form-check form-switch p-0 d-flex align-items-center justify-content-start col-9">
+                                <input id="enable" name="enable" class="form-check-input m-0" type="checkbox" onclick="changeEnable()">
+                            </div>
+                        </div>
+                        <div class="col-4 d-flex justify-content-end">
+                            <button class="btn btn-outline-primary px-5 " onclick="updateProduct()"><i class='bx bx-cloud-upload mr-1'></i>更新</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -110,9 +119,7 @@
             </div>
         </div>
     </div>
-        
 </div>
-
 
 @endsection
 @section('script')
@@ -133,10 +140,10 @@
         return response.data.category
     }
 
-    //組合分類selectHtml
+    // 組合分類selectHtml
     const categoryHtml = async (categoryId) => {
         let category = await getAllCategory()
-        let html = `<option value="">選擇商品分類</option>`
+        let html = ``
         category.forEach((category, $key) => {
             html += categoryId == category.categoryId ? `<option selected value="${category.categoryId}">${category.categoryName}</option>` : `<option value="${category.categoryId}">${category.categoryName}</option>`
         });
@@ -159,9 +166,16 @@
             let productName = response.data.product[0].productName
             let categoryId = response.data.product[0].categoryId
             let description = response.data.product[0].description
+            let enable = response.data.product[0].enable
             $('input#productName').val(productName)
             categoryHtmlInsert(categoryId)
             $('textarea#description').val(description)
+            $('input#oldCategory').val(categoryId)
+            if(enable == 1){
+                $("input#enable").prop("checked", true).val(1);
+            }else{
+                $("input#enable").prop("checked", false).val(0);
+            }
         }
     }
 
@@ -175,13 +189,16 @@
         let productName = $('input#productName').val()
         let categoryId = $('select#category').val()
         let description = $('textarea#description').val()
+        let enable = $('input#enable').val()
         response = await axios.post("{{route('productUpdate')}}",{
             'productId': productId,
             'productName': productName,
             'categoryId': categoryId,
-            'description': description
+            'description': description,
+            'enable': enable
         });
         if(response){
+            $('input#oldCategory').val(categoryId)
             alert(response.data.message)
         }else{
             alert("更新失敗")
@@ -190,18 +207,17 @@
 
     // 回到商品管理頁面
     const backToProductIndex = async () => {
-        categoryId = $('select#category').val()
+        categoryId = $('input#oldCategory').val()
         let url = '{{route("productIndex", ["categoryId"=>":categoryId"])}}';
         url = url.replace(':categoryId', categoryId)
         location.href = url;
+    } 
+
+    // 商上下架
+    const changeEnable = async () => {
+        $(`input#enable:checked`).val() ? $(`input#enable`).val(1) : $(`input#enable`).val(0)
     }
 
-
-
-
-    
-
-    
 </script>
 
 @endsection
