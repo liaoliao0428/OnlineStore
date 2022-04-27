@@ -50,7 +50,7 @@ class ProductController extends Controller
 
         // 撈指定分類商品
         if($categoryId == 0){   // categoryId != 0 撈全部
-            $productsMain = ProductModel::select_product_db();
+            $product = null;
         }else{
             $productsMain = ProductModel::select_product_with_categoryId_db($categoryId);
         }
@@ -110,6 +110,15 @@ class ProductController extends Controller
         $productId = $request->productId;
         ProductModel::delete_product_db($productId);
         return response()->json(['message' => "刪除成功"], Response::HTTP_OK);
+    }
+
+    // 商品上下架
+    public function changeEnable(Request $request)
+    {
+        $productId = $request->productId;
+        $enable = $request->enable;
+        ProductModel::update_product_enable_db($productId,$enable);
+        return response()->json(['message' => "上/下架成功"], Response::HTTP_OK);
     }
 
 }

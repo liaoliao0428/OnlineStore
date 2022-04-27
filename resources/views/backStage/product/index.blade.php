@@ -38,9 +38,9 @@
                 <thead>
                     <tr>
                         <th scope="col" width="5%" class="text-center fs-4">#</th>
-                        <th scope="col" width="25%" class="text-center fs-4">商品圖</th>
-                        <th scope="col" width="35%" class="text-center fs-4">商品</th>
-                        <th scope="col" width="15%" class="text-center fs-4">上下架</th>
+                        <th scope="col" width="15%" class="text-center fs-4">商品圖</th>
+                        <th scope="col" width="55%" class="text-center fs-4">商品</th>
+                        <th scope="col" width="10%" class="text-center fs-4">上下架</th>
                         <th scope="col" width="20%" class="text-center fs-4">操作</th>
                     </tr>
                 </thead>
@@ -122,6 +122,17 @@
     }
     /**************************************商品刪除************************************ */
 
+    // 商上下架
+    const changeProductEnable = async (productId) => {
+        let productEnable = productId + "_enable"
+        if ($(`#${productEnable}:checked`).val()) {
+            enable = 1
+        } else {
+            enable = 0
+        }
+        let response =  await axios.post("{{route('productChangeEnable')}}",{'productId': productId,'enable': enable});  
+    }
+
 
 
     /**************************************抓商品************************************ */
@@ -170,14 +181,22 @@
                 let productDetailName = productDetail.productDetailName
                 let specification = productDetail.specification
                 let unitPrice = productDetail.unitPrice
-                let quantity = productDetail.quantity
-                htmlBody += `<div class="row m-0 p-0 align-items-start">
-                                <div class="col-3 p-0 border-bottom border-end fs-4">${productDetailIndex+1}</div>
-                                <div class="col-3 p-0 border-bottom border-end fs-4">${specification}</div>
-                                <div class="col-3 p-0 border-bottom border-end fs-4">${unitPrice}</div>
-                                <div class="col-3 p-0 border-bottom fs-4">${quantity}</div>
+                let quantity = productDetail.quantity               
+                htmlBody += `<div class="row m-0 p-0  border-bottom">
+                                <div class="col-1 p-0  border-end fs-4 d-flex align-items-center justify-content-center"><span class="">${productDetailIndex+1}</div>
+                                <div class="col-4 p-0  border-end fs-4 d-flex align-items-center justify-content-center">${productDetailName}</div>
+                                <div class="col-2 p-0  border-end fs-4 d-flex align-items-center justify-content-center">${specification}</div>
+                                <div class="col-3 p-0  border-end fs-4 d-flex align-items-center justify-content-center">$${unitPrice}</div>
+                                <div class="col-2 p-0  fs-4 d-flex align-items-center justify-content-center">${quantity}</div>
                             </div>`
             });
+
+            let enableCheck = ``
+            if(enable == 1){
+                enableCheck = `<input id="${productId}_enable" name="${productId}_enable" class="form-check-input m-0" type="checkbox" onclick="changeProductEnable('${productId}')" checked>`
+            }else{
+                enableCheck = `<input id="${productId}_enable" name="${productId}_enable" class="form-check-input m-0" type="checkbox" onclick="changeProductEnable('${productId}')">`
+            }
 
             html += `<tr class="text-center align-middle">
                         <!-- 排序 -->
@@ -190,17 +209,18 @@
                                 <div class="col-12 p-0 border-bottom fs-4 fw-bolder">商品 - ${productName}</div>
                             </div>
                             <div class="row m-0 p-0 align-items-start">
-                                <div class="col-3 p-0 border-bottom border-end fs-4">#</div>
-                                <div class="col-3 p-0 border-bottom border-end fs-4">規格</div>
-                                <div class="col-3 p-0 border-bottom border-end fs-4">價格</div>
-                                <div class="col-3 p-0 border-bottom fs-4">數量</div>
+                                    <div class="col-1 p-0 border-bottom border-end fs-4">#</div>
+                                    <div class="col-4 p-0 border-bottom border-end fs-4">名稱</div>
+                                    <div class="col-2 p-0 border-bottom border-end fs-4">規格</div>
+                                    <div class="col-3 p-0 border-bottom border-end fs-4">價格</div>
+                                    <div class="col-2 p-0 border-bottom fs-4">數量</div>
                             </div>
                             ${htmlBody}               
                         </td>
                         <!-- 上下架 -->
                         <td>
                             <div class="form-check form-switch p-0 d-flex justify-content-center">
-                                <input class="form-check-input m-0" type="checkbox" id="" onclick="">
+                                ${enableCheck}
                             </div>
                         </td>
                         <!-- 操作 -->

@@ -44,6 +44,9 @@ Route::prefix('product')->group(function () {
     Route::post('/update', [App\Http\Controllers\Product\ProductController::class, 'update'])->name('productUpdate');
     // 商品刪除
     Route::post('/delete', [App\Http\Controllers\Product\ProductController::class, 'delete'])->name('productDelete');
+    // 上下架
+    Route::post('/changeEnable', [App\Http\Controllers\Product\ProductController::class, 'changeEnable'])->name('productChangeEnable');
+
 });
 /***************************************product************************************* */
 
