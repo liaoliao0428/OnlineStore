@@ -78,42 +78,87 @@
         <div class="col-12">
             <div class="card p-3">
                 <label for="inputFirstName" class="form-label fs-2 d-flex justify-content-center">商品子項</label>
+                <!-- 品項1 -->
                 <div class="card">
                     <div class="card-body">
-                        <label for="inputFirstName" class="form-label fs-2 d-flex justify-content-start">商品1</label>
-                        <div class="col-12">
-                            <label for="inputFirstName" class="form-label fs-4">商品名稱</label>
-                            <input type="email" class="form-control" id="inputFirstName">
-                        </div>
-                        <div class="col-12 mt-3">
-                            <label for="inputLastName" class="form-label fs-4">商品分類</label>
-                            <select class="form-select" name="category" id="category" >
-                                <option value="United States">United States</option>
-                            </select>
-                        </div>
-                        <div class="col-12 mt-3">
-                            <label for="inputEmail" class="form-label fs-4">商品描述</label>
-                            <textarea  type="textarea" class="form-control" id="inputEmail"></textarea>
+                        <label for="inputFirstName" class="form-label fs-2 d-flex justify-content-start">品項1</label>
+                        <div class="col-12 row">
+                            <div class="col-3">
+                                <label for="inputFirstName" class="form-label fs-4">品名</label>
+                                <input type="email" class="form-control" id="inputFirstName">
+                            </div>
+                            <div class="col-2">
+                                <label for="inputFirstName" class="form-label fs-4">規格</label>
+                                <input type="email" class="form-control" id="inputFirstName">
+                            </div>
+                            <div class="col-2">
+                                <label for="inputFirstName" class="form-label fs-4">單價</label>
+                                <input type="email" class="form-control" id="inputFirstName">
+                            </div>
+                            <div class="col-2">
+                                <label for="inputFirstName" class="form-label fs-4">數量</label>
+                                <input type="email" class="form-control" id="inputFirstName">
+                            </div>
+                            <div class="col-1">
+                            <label for="inputFirstName" class="form-label fs-4">上下架</label>
+                                <div class="form-check form-switch p-0 d-flex align-items-end justify-content-center col-9">
+                                    <input id="enable" name="enable" class="form-check-input m-0" type="checkbox" onclick="changeEnable()">
+                                </div>
+                            </div>
+                            <div class="col-2 row d-flex align-items-center justify-content-end">
+                                <label for="inputFirstName" class="form-label fs-4 d-flex justify-content-center">排序</label>
+                                <!-- 上下移按鈕 -->
+                                <div class="col-2"></div>
+                                <button type="button" class="col-3 btn btn-outline-secondary  text-center"><i class='bx bx-caret-up-circle m-0'></i></button>
+                                <div class="col-2"></div>
+                                <button type="button" class="col-3 btn btn-outline-secondary  text-center"><i class='bx bx-caret-down-circle m-0'></i></button>
+                                <div class="col-2"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="card ">
+                <!-- 品項1 -->
+                <div class="card">
                     <div class="card-body">
-                        <label for="inputFirstName" class="form-label fs-2 d-flex justify-content-start">商品2</label>
-                        <div class="col-12">
-                            <label for="inputFirstName" class="form-label fs-4">商品名稱</label>
-                            <input type="email" class="form-control" id="inputFirstName">
+                        <label for="inputFirstName" class="form-label fs-2 d-flex justify-content-start">品項2</label>
+                        <div class="col-12 row">
+                            <div class="col-3">
+                                <label for="inputFirstName" class="form-label fs-4">品名</label>
+                                <input type="email" class="form-control" id="inputFirstName">
+                            </div>
+                            <div class="col-2">
+                                <label for="inputFirstName" class="form-label fs-4">規格</label>
+                                <input type="email" class="form-control" id="inputFirstName">
+                            </div>
+                            <div class="col-2">
+                                <label for="inputFirstName" class="form-label fs-4">單價</label>
+                                <input type="email" class="form-control" id="inputFirstName">
+                            </div>
+                            <div class="col-2">
+                                <label for="inputFirstName" class="form-label fs-4">數量</label>
+                                <input type="email" class="form-control" id="inputFirstName">
+                            </div>
+                            <div class="col-1">
+                            <label for="inputFirstName" class="form-label fs-4">上下架</label>
+                                <div class="form-check form-switch p-0 d-flex align-items-end justify-content-center col-9">
+                                    <input id="enable" name="enable" class="form-check-input m-0" type="checkbox" onclick="changeEnable()">
+                                </div>
+                            </div>
+                            <div class="col-2 row d-flex align-items-center justify-content-end">
+                                <label for="inputFirstName" class="form-label fs-4 d-flex justify-content-center">排序</label>
+                                <!-- 上下移按鈕 -->
+                                <div class="col-2"></div>
+                                <button type="button" class="col-3 btn btn-outline-secondary  text-center"><i class='bx bx-caret-up-circle m-0'></i></button>
+                                <div class="col-2"></div>
+                                <button type="button" class="col-3 btn btn-outline-secondary  text-center"><i class='bx bx-caret-down-circle m-0'></i></button>
+                                <div class="col-2"></div>
+                            </div>
                         </div>
-                        <div class="col-12 mt-3">
-                            <label for="inputLastName" class="form-label fs-4">商品分類</label>
-                            <select class="form-select" name="category" id="category" onchange=changeSize()>
-                                <option value="United States">United States</option>
-                            </select>
-                        </div>
-                        <div class="col-12 mt-3">
-                            <label for="inputEmail" class="form-label fs-4">商品描述</label>
-                            <textarea  type="textarea" class="form-control" id="inputEmail"></textarea>
-                        </div>
+                    </div>
+                </div>
+                <div class="col-12 d-flex mt-4">
+                    <div class="col-12 d-flex justify-content-end">
+                        <button class="btn btn-outline-primary px-5 " onclick="updateProduct()"><i class='bx bx-cloud-upload mr-1'></i>更新</button>
                     </div>
                 </div>
             </div>

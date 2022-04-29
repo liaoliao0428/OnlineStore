@@ -92,7 +92,7 @@
         if(categoryId == 0){
             alert("請選擇正確分類")
             return false
-        }
+        } 
     }
 
     // 回到商品管理頁面
