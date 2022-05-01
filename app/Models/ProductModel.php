@@ -24,10 +24,9 @@ class Product extends Model
         'productId',
         'productName',
         'categoryId',
-        'description'
+        'description',
+        'sort'
     ];
-
-
 }
 
 class ProductModel 
@@ -41,7 +40,7 @@ class ProductModel
     // 取得指定分類商品
     public static function select_product_with_categoryId_db($categoryId)
     {
-        return DB::select("SELECT * FROM product WHERE categoryId = '$categoryId'");
+        return DB::select("SELECT * FROM product WHERE categoryId = '$categoryId' ORDER BY sort ASC");
     }
 
     // 取得指定商品
@@ -78,5 +77,11 @@ class ProductModel
     public static function update_product_enable_db($productId,$enable)
     {
         Product::where('productId',$productId)->update(['enable'=>$enable]);
+    }
+
+    // 商品改排序
+    public static function update_product_sort_db($productId,$sort)
+    {
+        Product::where('productId',$productId)->update(['sort'=>$sort]);
     }
 }

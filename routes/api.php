@@ -5,8 +5,10 @@ use Illuminate\Support\Facades\Route;
 
 /************************************ backStage API Contorller************************************ */
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Category\CategoryController;
+
+use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\p\Product\ProductDetailController;
 /************************************ backStage API Contorller************************************ */
 
 
@@ -27,6 +29,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 /***************************************category************************************* */
+// 分類 category
 Route::prefix('category')->group(function () {
     //產生作廢發票0501_xml
     Route::post('/all', [App\Http\Controllers\Category\CategoryController::class, 'categoryAll'])->name('categoryAll');
@@ -35,8 +38,7 @@ Route::prefix('category')->group(function () {
 
 
 /***************************************product************************************* */
-
-// 商品
+// 商品 product
 Route::prefix('product')->group(function () {
     // 取得商品
     Route::post('/', [App\Http\Controllers\Product\ProductController::class, 'product'])->name('product');
@@ -46,7 +48,24 @@ Route::prefix('product')->group(function () {
     Route::post('/delete', [App\Http\Controllers\Product\ProductController::class, 'delete'])->name('productDelete');
     // 上下架
     Route::post('/changeEnable', [App\Http\Controllers\Product\ProductController::class, 'changeEnable'])->name('productChangeEnable');
+    // 改變排序
+    Route::post('/changeSort', [App\Http\Controllers\Product\ProductController::class, 'changeSort'])->name('productchangeSort');
+});
 
+// 商品子項 productDetail
+Route::prefix('productDetail')->group(function () {
+    // 取得商品子項
+    Route::post('/', [App\Http\Controllers\Product\ProductDetailController::class, 'productDetail'])->name('productDetail');
+    // 商品子項新增
+    Route::post('/insert', [App\Http\Controllers\Product\ProductDetailController::class, 'insert'])->name('productDetailInsert');
+    // 商品子項更新
+    Route::post('/update', [App\Http\Controllers\Product\ProductDetailController::class, 'update'])->name('productDetailUpdate');
+    // 商品子項刪除
+    Route::post('/delete', [App\Http\Controllers\Product\ProductDetailController::class, 'delete'])->name('productDetailDelete');
+    // 商品子項上下架
+    Route::post('/changeEnable', [App\Http\Controllers\Product\ProductDetailController::class, 'changeEnable'])->name('productDetailChangeEnable');
+    // 改變排序
+    Route::post('/changeSort', [App\Http\Controllers\Product\ProductDetailController::class, 'changeSort'])->name('productDetailchangeSort');
 });
 /***************************************product************************************* */
 

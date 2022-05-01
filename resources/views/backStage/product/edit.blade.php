@@ -22,11 +22,17 @@
         <!-- 商品資料 -->
         <div class="col-5">
             <div class="card ">
-                <div class="card-body ">
-                    <label for="inputFirstName" class="form-label fs-2 d-flex justify-content-center">商品資料</label>
+                <div class="card-body">
+                    <div class="col-12 d-flex">                    
+                        <label for="inputFirstName" class="form-label col-7 fs-2 d-flex justify-content-end">商品資料</label>
+                        <div class="col-2"></div>
+                        <button class="btn btn-outline-danger px-5 my-2 col-3" onclick="deleteProductConfirm()"><i class='bx bx-trash mr-1'></i>刪除</button>
+                    </div>
                     <div class="col-12">
                         <label for="productName" class="form-label fs-4">商品名稱</label>
-                        <input id="productName" name="productName" class="form-control" >
+                        <input type="hidden" name="productId" id="productId">
+                        <input type="" name="oldSort" id="oldSort">
+                        <input id="productName" name="productName" class="form-control">
                     </div>
                     <div class="col-12 mt-3">
                         <label for="category" class="form-label fs-4">商品分類</label>
@@ -36,17 +42,17 @@
                     </div>
                     <div class="col-12 ">
                         <label for="description" class="form-label fs-4 ">商品描述</label>
-                        <textarea id="description" name="description" type="textarea" class="form-control" ></textarea>
+                        <textarea id="description" name="description" type="textarea" class="form-control"></textarea>
                     </div>
                     <div class="col-12 d-flex mt-4">
                         <div class="col-8 d-flex">
                             <label for="description" class="form-label fs-4 m-0 col-3 d-flex align-items-center justify-content-start">上下架</label>
                             <div class="form-check form-switch p-0 d-flex align-items-center justify-content-start col-9">
-                                <input id="enable" name="enable" class="form-check-input m-0" type="checkbox" onclick="changeEnable()">
+                                <input id="enable" name="enable" class="form-check-input m-0" type="checkbox" onclick="changeProductEnable()">
                             </div>
                         </div>
                         <div class="col-4 d-flex justify-content-end">
-                            <button class="btn btn-outline-primary px-5 " onclick="updateProduct()"><i class='bx bx-cloud-upload mr-1'></i>更新</button>
+                            <button class="btn btn-outline-primary px-5" onclick="updateProduct()"><i class='bx bx-cloud-upload mr-1'></i>更新</button>
                         </div>
                     </div>
                 </div>
@@ -69,7 +75,7 @@
                     </div>
                     <div class="col-12 mt-3">
                         <label for="inputEmail" class="form-label fs-4">商品描述</label>
-                        <textarea  type="textarea" class="form-control" id="inputEmail"></textarea>
+                        <textarea type="textarea" class="form-control" id="inputEmail"></textarea>
                     </div>
                 </div>
             </div>
@@ -77,89 +83,55 @@
         <!-- 商品子項 -->
         <div class="col-12">
             <div class="card p-3">
-                <label for="inputFirstName" class="form-label fs-2 d-flex justify-content-center">商品子項</label>
-                <!-- 品項1 -->
-                <div class="card">
-                    <div class="card-body">
-                        <label for="inputFirstName" class="form-label fs-2 d-flex justify-content-start">品項1</label>
-                        <div class="col-12 row">
-                            <div class="col-3">
-                                <label for="inputFirstName" class="form-label fs-4">品名</label>
-                                <input type="email" class="form-control" id="inputFirstName">
-                            </div>
-                            <div class="col-2">
-                                <label for="inputFirstName" class="form-label fs-4">規格</label>
-                                <input type="email" class="form-control" id="inputFirstName">
-                            </div>
-                            <div class="col-2">
-                                <label for="inputFirstName" class="form-label fs-4">單價</label>
-                                <input type="email" class="form-control" id="inputFirstName">
-                            </div>
-                            <div class="col-2">
-                                <label for="inputFirstName" class="form-label fs-4">數量</label>
-                                <input type="email" class="form-control" id="inputFirstName">
-                            </div>
-                            <div class="col-1">
-                            <label for="inputFirstName" class="form-label fs-4">上下架</label>
-                                <div class="form-check form-switch p-0 d-flex align-items-end justify-content-center col-9">
-                                    <input id="enable" name="enable" class="form-check-input m-0" type="checkbox" onclick="changeEnable()">
+                <div class="col-12 d-flex mb-2">
+                    <div class="col-3">
+                    </div>
+                    <div class="col-6">
+                        <label for="inputFirstName" class="form-label fs-2 d-flex justify-content-center">商品子項</label>
+                    </div>
+                    <div class="col-3 d-flex justify-content-end m-2 pe-2">
+                        <button class="btn btn-outline-success px-5 me-1 " data-bs-toggle="modal" data-bs-target="#insertProductDetail">新增子項</button>
+                    </div>
+                    <!-- 新增子項彈窗 -->
+                    <div class="modal fade" id="insertProductDetail" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3 class="modal-title" id="staticBackdropLabel">新增商品子項</h3>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                            </div>
-                            <div class="col-2 row d-flex align-items-center justify-content-end">
-                                <label for="inputFirstName" class="form-label fs-4 d-flex justify-content-center">排序</label>
-                                <!-- 上下移按鈕 -->
-                                <div class="col-2"></div>
-                                <button type="button" class="col-3 btn btn-outline-secondary  text-center"><i class='bx bx-caret-up-circle m-0'></i></button>
-                                <div class="col-2"></div>
-                                <button type="button" class="col-3 btn btn-outline-secondary  text-center"><i class='bx bx-caret-down-circle m-0'></i></button>
-                                <div class="col-2"></div>
+                                <div class="modal-body">
+                                    <div class="col-9">
+                                        <label for="inputFirstName" class="form-label fs-4">品名</label>
+                                        <input type="productDetailName" class="form-control" id="productDetailName">
+                                    </div>
+                                    <hr>
+                                    <div class="col-6 mt-2">
+                                        <label for="inputFirstName" class="form-label fs-4">規格</label>
+                                        <input type="specification" class="form-control" id="specification">
+                                    </div>
+                                    <hr>
+                                    <div class="col-6">
+                                        <label for="inputFirstName" class="form-label fs-4">單價</label>
+                                        <input type="number" class="form-control" id="unitPrice">
+                                    </div>
+                                    <hr>
+                                    <div class="col-6">
+                                        <label for="inputFirstName" class="form-label fs-4">數量</label>
+                                        <input type="number" class="form-control" id="quantity" value="0">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                    <button type="button" class="btn btn-success" onclick="insertProductDetail()">新增</button>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <!-- 新增子項彈窗 -->
                 </div>
-                <!-- 品項1 -->
-                <div class="card">
-                    <div class="card-body">
-                        <label for="inputFirstName" class="form-label fs-2 d-flex justify-content-start">品項2</label>
-                        <div class="col-12 row">
-                            <div class="col-3">
-                                <label for="inputFirstName" class="form-label fs-4">品名</label>
-                                <input type="email" class="form-control" id="inputFirstName">
-                            </div>
-                            <div class="col-2">
-                                <label for="inputFirstName" class="form-label fs-4">規格</label>
-                                <input type="email" class="form-control" id="inputFirstName">
-                            </div>
-                            <div class="col-2">
-                                <label for="inputFirstName" class="form-label fs-4">單價</label>
-                                <input type="email" class="form-control" id="inputFirstName">
-                            </div>
-                            <div class="col-2">
-                                <label for="inputFirstName" class="form-label fs-4">數量</label>
-                                <input type="email" class="form-control" id="inputFirstName">
-                            </div>
-                            <div class="col-1">
-                            <label for="inputFirstName" class="form-label fs-4">上下架</label>
-                                <div class="form-check form-switch p-0 d-flex align-items-end justify-content-center col-9">
-                                    <input id="enable" name="enable" class="form-check-input m-0" type="checkbox" onclick="changeEnable()">
-                                </div>
-                            </div>
-                            <div class="col-2 row d-flex align-items-center justify-content-end">
-                                <label for="inputFirstName" class="form-label fs-4 d-flex justify-content-center">排序</label>
-                                <!-- 上下移按鈕 -->
-                                <div class="col-2"></div>
-                                <button type="button" class="col-3 btn btn-outline-secondary  text-center"><i class='bx bx-caret-up-circle m-0'></i></button>
-                                <div class="col-2"></div>
-                                <button type="button" class="col-3 btn btn-outline-secondary  text-center"><i class='bx bx-caret-down-circle m-0'></i></button>
-                                <div class="col-2"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 d-flex mt-4">
-                    <div class="col-12 d-flex justify-content-end">
-                        <button class="btn btn-outline-primary px-5 " onclick="updateProduct()"><i class='bx bx-cloud-upload mr-1'></i>更新</button>
-                    </div>
+                <!-- 商品細項 -->
+                <div id="productDetail">
                 </div>
             </div>
         </div>
@@ -177,6 +149,16 @@
         let productId = splitUrl[5]
         return productId
     }
+
+    // 回到商品管理頁面
+    const backToProductIndex = async () => {
+        categoryId = $('input#oldCategory').val()
+        let url = '{{route("productIndex", ["categoryId"=>":categoryId"])}}';
+        url = url.replace(':categoryId', categoryId)
+        location.href = url;
+    }
+    
+/********************************************************************商品相關******************************************************************************* */
 
     /**************************************抓分類************************************ */
     // 撈全部分類
@@ -198,7 +180,7 @@
     // categoryHtml 塞入select
     const categoryHtmlInsert = async (categoryId) => {
         let category = await categoryHtml(categoryId)
-        $('select#category').html(category) //把banner指定給這個function
+        $('select#category').html(category)
     }
     /**************************************抓分類************************************ */
 
@@ -206,19 +188,24 @@
     // 撈此分類全部商品資料
     const getProduct = async () => {
         let productId = await getProductIdFromUrl()
-        let response = await axios.post("{{route('product')}}", {'productId': productId});
-        if(response){
+        let response = await axios.post("{{route('product')}}", {
+            'productId': productId
+        });
+        if (response) {
             let productName = response.data.product[0].productName
             let categoryId = response.data.product[0].categoryId
             let description = response.data.product[0].description
             let enable = response.data.product[0].enable
+            let sort = response.data.product[0].sort
             $('input#productName').val(productName)
             categoryHtmlInsert(categoryId)
             $('textarea#description').val(description)
             $('input#oldCategory').val(categoryId)
-            if(enable == 1){
+            $('input#productId').val(productId)
+            $('input#oldSort').val(sort)
+            if (enable == 1) {
                 $("input#enable").prop("checked", true).val(1);
-            }else{
+            } else {
                 $("input#enable").prop("checked", false).val(0);
             }
         }
@@ -232,36 +219,332 @@
     const updateProduct = async () => {
         let productId = await getProductIdFromUrl()
         let productName = $('input#productName').val()
+        let oldCategoryId = $('input#oldCategory').val()
+        let oldSort = $('input#oldSort').val()
         let categoryId = $('select#category').val()
         let description = $('textarea#description').val()
         let enable = $('input#enable').val()
-        response = await axios.post("{{route('productUpdate')}}",{
+        response = await axios.post("{{route('productUpdate')}}", {
             'productId': productId,
             'productName': productName,
+            'oldCategoryId': oldCategoryId,
+            'oldSort': oldSort,
             'categoryId': categoryId,
             'description': description,
             'enable': enable
         });
-        if(response){
+
+        // 商品名稱驗證
+        if(!productName){
+            alert('商品名稱不可空白')
+            return false 
+        }
+
+        if (response) {
             $('input#oldCategory').val(categoryId)
             alert(response.data.message)
-        }else{
+            getProduct()
+        } else {
             alert("更新失敗")
         }
     }
 
-    // 回到商品管理頁面
-    const backToProductIndex = async () => {
-        categoryId = $('input#oldCategory').val()
-        let url = '{{route("productIndex", ["categoryId"=>":categoryId"])}}';
-        url = url.replace(':categoryId', categoryId)
-        location.href = url;
-    } 
+    /**************************************商品刪除************************************ */
+    // 商品刪除確認
+    const deleteProductConfirm = () => {
+        let productId = $('input#productId').val()
+        let check = confirm('確定刪除商品，所有資料將會遺失？');
+        if(check){
+            deleteProduct(productId)
+        }else{
+            return false
+        }
+    }
+
+    // 商品刪除
+    const deleteProduct = async (productId) => {
+        // 打axios刪除
+        let response = await axios.post("{{route('productDelete')}}", {'productId': productId});
+        if(response){
+            alert(response.data.message)
+            await backToProductIndex()
+        }        
+    }
+    /**************************************商品刪除************************************ */   
 
     // 商上下架
-    const changeEnable = async () => {
+    const changeProductEnable = async () => {
         $(`input#enable:checked`).val() ? $(`input#enable`).val(1) : $(`input#enable`).val(0)
+        let productId = $('input#productId').val()
+        let enable = $(`input#enable`).val()
+        let response =  await axios.post("{{route('productChangeEnable')}}",{'productId': productId,'enable': enable});  
+    }    
+/********************************************************************商品相關******************************************************************************* */
+
+/********************************************************************商品子項相關******************************************************************************* */    
+    // 新增商品子項
+    const insertProductDetail = async () => {
+        let productId = $('input#productId').val()
+        let productDetailName = $('input#productDetailName').val()
+        let specification = $('input#specification').val()
+        let unitPrice = $('input#unitPrice').val()
+        let quantity = $('input#quantity').val()
+
+        // 商品子項名稱驗證
+        if(!productDetailName){
+            alert('品名不可空白')
+            return false 
+        }
+
+        // 規格驗證
+        if(!specification){
+            alert('規格不可空白')
+            return false 
+        }
+
+        // 單價驗證
+        if(unitPrice < 0){
+            alert('單價錯誤')
+            return false
+        }
+
+        // 數量驗證
+        if(quantity <0){
+            alert('數量錯誤')
+            return false
+        }
+
+        let response = await axios.post("{{route('productDetailInsert')}}", {
+            'productId': productId,
+            'productDetailName': productDetailName,
+            'specification': specification,
+            'unitPrice': Number(unitPrice),
+            'quantity': Number(quantity)
+        })
+        if(response){
+            window.location.reload()
+        }
     }
+
+    // 商品子項更新
+    const updatePorductDetail = async (productDetailId) => {
+        let productDetailName = $(`input#${productDetailId}_productDetailName`).val()
+        let specification = $(`input#${productDetailId}_specification`).val()
+        let unitPrice = $(`input#${productDetailId}_unitPrice`).val()
+        let quantity = $(`input#${productDetailId}_quantity`).val()
+
+        // 商品子項名稱驗證
+        if(!productDetailName){
+            alert('品名不可空白')
+            return false 
+        }
+
+        // 規格驗證
+        if(!specification){
+            alert('規格不可空白')
+            return false 
+        }
+
+        // 單價驗證
+        if(unitPrice < 0){
+            alert('單價錯誤')
+            return false
+        }
+
+        // 數量驗證
+        if(quantity <0){
+            alert('數量錯誤')
+            return false
+        }
+
+        let response = await axios.post("{{route('productDetailUpdate')}}",{
+            'productDetailId': productDetailId,
+            'productDetailName': productDetailName,
+            'specification': specification,
+            'unitPrice': Number(unitPrice),
+            'quantity': Number(quantity)
+        })
+        if(response){
+            alert("商品子項更新成功")
+            productDetailHtmlInsert()
+            let modal = '#' + productDetailId + "_edit"
+            $(modal).modal('hide')
+        }
+    }
+
+    /**************************************商品子項刪除************************************ */
+    // 商品刪除確認
+    const deleteProductDetailConfirm = (productDetailId) => {
+        let check = confirm('確定刪除商品子項，所有資料將會遺失？');
+        if(check){
+            deleteProductDetail(productDetailId)
+        }else{
+            return false
+        }
+    }
+
+    // 商品子項刪除
+    const deleteProductDetail = async (productDetailId) => {
+        // 打axios刪除
+        let response = await axios.post("{{route('productDetailDelete')}}", {'productDetailId': productDetailId});
+        if(response){
+            alert(response.data.message)
+            productDetailHtmlInsert()
+        }        
+    }
+    /**************************************商品子項刪除************************************ */
+
+    // 商品子項上下架
+    const changeProductDetailEnable = async (productDetailId) => {
+        $(`input#${productDetailId}_enable:checked`).val() ? $(`input#${productDetailId}_enable`).val(1) : $(`input#${productDetailId}_enable`).val(0)
+        let enable = $(`input#${productDetailId}_enable`).val()
+        let response =  await axios.post("{{route('productDetailChangeEnable')}}",{'productDetailId': productDetailId,'enable': enable});
+    }
+
+    // 改變排序
+    const changeProductDetailSort = async (productDetailId,newSort,oldSort,productDetailsCount) => {
+        if(newSort <= 0 || newSort > productDetailsCount){
+            return null
+        }
+        let response = await axios.post("{{route('productDetailchangeSort')}}",{
+            'productDetailId': productDetailId,
+            'newSort': newSort,
+            'oldSort': oldSort
+        })
+        productDetailHtmlInsert()
+    }
+
+    /**************************************產出productDetail的HTML並塞入************************************ */
+    // 抓productDetail 資料
+    const getProductDetail = async () =>{
+        let productId = await getProductIdFromUrl()
+        let response = await axios.post("{{route('productDetail')}}", {
+            'productId': productId
+        })
+        return response.data.productDetail
+    }
+
+    // 產出productDetail 資料
+    const productDetailHtml = async (productDetails) =>{
+        let html = ``
+        if(productDetails === "無資料"){
+            return html
+        }
+        let productDetailsCount = productDetails.length
+        productDetails.forEach((productDetail,key)=>{
+            let productDetailId = productDetail.productDetailId
+            let productDetailName = productDetail.productDetailName
+            let specification = productDetail.specification
+            let unitPrice = productDetail.unitPrice
+            let quantity = productDetail.quantity
+            let enable = productDetail.enable
+            let sort = productDetail.sort
+
+            let enableHtml = ``
+            if(enable == 1){
+                enableHtml = `<input id="${productDetailId}_enable" name="${productDetailId}_enable" class="form-check-input m-0" type="checkbox" onclick="changeProductDetailEnable('${productDetailId}')" checked>`
+            }else{
+                enableHtml = `<input id="${productDetailId}_enable" name="${productDetailId}_enable" class="form-check-input m-0" type="checkbox" onclick="changeProductDetailEnable('${productDetailId}')">`
+            }
+
+            html += `<!-- 品項${key+1} -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="col-12 d-flex">
+                                <label for="index" class="form-label fs-2 d-flex justify-content-start col-8">品項${key+1}</label>
+                                <div class="col-4 d-flex justify-content-end my-3 ms-2">
+                                    <button class="btn btn-outline-primary px-5 me-2" data-bs-toggle="modal" data-bs-target="#${productDetailId}_edit" ><i class='bx bx-cloud-upload mr-1'></i>編輯</button>
+                                    <button class="btn btn-outline-danger px-5" onclick="deleteProductDetailConfirm('${productDetailId}')"><i class='bx bx-trash mr-1'></i>刪除</button>
+                                </div>
+                                <!-- 新增子項彈窗 -->
+                                <div class="modal fade" id="${productDetailId}_edit" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h3 class="modal-title" id="staticBackdropLabel">編輯商品子項</h3>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="col-9">
+                                                    <label for="${productDetailId}_productDetailName" class="form-label fs-4">品名</label>
+                                                    <input type="productDetailName" class="form-control" id="${productDetailId}_productDetailName" value="${productDetailName}">
+                                                </div>
+                                                <hr>
+                                                <div class="col-6 mt-2">
+                                                    <label for="${productDetailId}_specification" class="form-label fs-4">規格</label>
+                                                    <input type="specification" class="form-control" id="${productDetailId}_specification" value="${specification}">
+                                                </div>
+                                                <hr>
+                                                <div class="col-6">
+                                                    <label for="${productDetailId}_unitPrice" class="form-label fs-4">單價</label>
+                                                    <input type="number" class="form-control" id="${productDetailId}_unitPrice" value="${unitPrice}">
+                                                </div>
+                                                <hr>
+                                                <div class="col-6">
+                                                    <label for="${productDetailId}_quantity" class="form-label fs-4">數量</label>
+                                                    <input type="number" class="form-control" id="${productDetailId}_quantity" value="${quantity}">
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                                <button type="button" class="btn btn-primary" onclick="updatePorductDetail('${productDetailId}')">更新</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 新增子項彈窗 -->
+                            </div>
+                            <hr class="m-0">
+                            <div class="col-12 row mt-3">
+                                <div class="col-3">
+                                    <label for="${productDetailId}_productDetaiName" class="form-label fs-4">品名</label>
+                                    <input type="email" class="form-control" value="${productDetailName}" disabled>
+                                </div>
+                                <div class="col-2">
+                                    <label for="${productDetailId}_specification" class="form-label fs-4">規格</label>
+                                    <input type="email" class="form-control" value="${specification}" disabled>
+                                </div>
+                                <div class="col-2">
+                                    <label for="${productDetailId}_unitPrice" class="form-label fs-4">單價</label>
+                                    <input type="email" class="form-control" value="${unitPrice}" disabled>
+                                </div>
+                                <div class="col-2">
+                                    <label for="${productDetailId}_quantity" class="form-label fs-4">數量</label>
+                                    <input type="email" class="form-control" value="${quantity}" disabled>
+                                </div>
+                                <div class="col-1">
+                                    <label for="inputFirstName" class="form-label fs-4">上下架</label>
+                                    <div class="form-check form-switch p-0 d-flex align-items-end justify-content-center col-9">
+                                        ${enableHtml}
+                                    </div>
+                                </div>
+                                <div class="col-2 row d-flex align-items-center justify-content-end">
+                                    <label for="inputFirstName" class="form-label fs-4 d-flex justify-content-center">排序</label>
+                                    <!-- 上下移按鈕 -->
+                                    <div class="col-2"></div>
+                                        <button type="button" class="col-3 btn btn-outline-secondary  text-center" onclick="changeProductDetailSort('${productDetailId}',${sort-1},${sort},${productDetailsCount})"><i class='bx bx-caret-up-circle m-0'></i></button>
+                                    <div class="col-2"></div>
+                                        <button type="button" class="col-3 btn btn-outline-secondary  text-center" onclick="changeProductDetailSort('${productDetailId}',${sort+1},${sort},${productDetailsCount})"><i class='bx bx-caret-down-circle m-0'></i></button>
+                                    <div class="col-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 品項${key+1} -->`
+        })
+        return  html
+    }
+
+    // 產出productDetail的HTML並塞入
+    const productDetailHtmlInsert = async () =>{
+        let productDetails = await getProductDetail()
+        let html = await productDetailHtml(productDetails)
+        $("#productDetail").html(html)
+    }
+    productDetailHtmlInsert()
+    /**************************************產出productDetail的HTML並塞入************************************ */
+
+/********************************************************************商品子項相關******************************************************************************* */    
 
 </script>
 
