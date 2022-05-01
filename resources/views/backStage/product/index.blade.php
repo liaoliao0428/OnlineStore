@@ -26,7 +26,7 @@
             </div>
         </div>
         <div class="col-8 text-end">
-            <button class="btn btn-outline-secondary px-5 mb-3 radius-30" onclick="addProduct()"><i class='bx bx-cloud-upload mr-1'></i>新增商品</button>
+            <button class="btn btn-outline-success px-5 mb-3 radius-30" onclick="addProduct()"><i class='bx bx-cloud-upload mr-1'></i>新增商品</button>
         </div>
     </div>
 
@@ -133,6 +133,20 @@
         let response =  await axios.post("{{route('productChangeEnable')}}",{'productId': productId,'enable': enable});  
     }
 
+    // 改變排序
+    const changeSort = async (productId,newSort,oldSort,productsCount) => {
+        if(newSort <= 0 || newSort > productsCount){
+            return null
+        }
+
+        let response = await axios.post("{{route('productchangeSort')}}",{
+            'productId': productId,
+            'newSort': newSort,
+            'oldSort': oldSort
+        })
+        productHtmlInsert()
+    }
+
 
 
     /**************************************抓商品************************************ */
@@ -169,11 +183,13 @@
 
         // 跑forEach組合html
         let html = ``
+        let productsCount = products.length
         products.forEach((product, productIndex) => {
             let productId = product.productId
             let productName = product.productName
             let enable = product.enable
             let productDetails = product.productDetail
+            let sort = product.sort
 
             // let htmlBody = await productBodyHtml(productDetails)
             let htmlBody = ``
@@ -181,7 +197,7 @@
                 let productDetailName = productDetail.productDetailName
                 let specification = productDetail.specification
                 let unitPrice = productDetail.unitPrice
-                let quantity = productDetail.quantity               
+                let quantity = productDetail.quantity        
                 htmlBody += `<div class="row m-0 p-0  border-bottom">
                                 <div class="col-1 p-0  border-end fs-4 d-flex align-items-center justify-content-center"><span class="">${productDetailIndex+1}</div>
                                 <div class="col-4 p-0  border-end fs-4 d-flex align-items-center justify-content-center">${productDetailName}</div>
@@ -236,9 +252,9 @@
                                 <div class="col-2"></div>
                                 <!-- 上下移按鈕 -->
                                 <div class="col-2"></div>
-                                    <button type="button" class="col-3 btn btn-outline-secondary mb-3 d-block text-center" ><i class='bx bx-caret-up-circle m-0'></i></button>
+                                    <button type="button" class="col-3 btn btn-outline-secondary mb-3 d-block text-center" onclick="changeSort('${productId}',${sort-1},${sort},${productsCount})"><i class='bx bx-caret-up-circle m-0'></i></button>
                                 <div class="col-2"></div>
-                                    <button type="button" class="col-3 btn btn-outline-secondary mb-3 d-block text-center"><i class='bx bx-caret-down-circle m-0'></i></button>
+                                    <button type="button" class="col-3 btn btn-outline-secondary mb-3 d-block text-center" onclick="changeSort('${productId}',${sort+1},${sort},${productsCount})"><i class='bx bx-caret-down-circle m-0'></i></button>
                                 <div class="col-2"></div>
                             </div>
                         </td>
@@ -265,14 +281,14 @@
         location.href = url;
     }
 
-    // 新增商品
+    // 新增商品頁面
     const addProduct = () => {
         categoryId = $('select[name="category"]').val()
         let url = '{{route("productAdd", ["categoryId"=>":categoryId"])}}';
         url = url.replace(':categoryId', categoryId)
         location.href = url;
-    }
-        
+    }   
+
 </script>
 
 @endsection
