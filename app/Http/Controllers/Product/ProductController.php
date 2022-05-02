@@ -9,7 +9,7 @@ use App\Models\ProductModel;
 use App\Http\Traits\ToolTrait;
 use App\Http\Traits\SortTrait;
 use Illuminate\Support\Facades\Cookie;
-
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -58,7 +58,8 @@ class ProductController extends Controller
             $productsMain = ProductModel::select_product_with_productId_db($productId);
         }
         
-        $product = $this->productArray($productsMain);
+        $host = $request->getSchemeAndHttpHost();
+        $product = $this->productArray($productsMain,$host);
 
         // 回傳資料
         if(!empty($product)){
@@ -69,7 +70,7 @@ class ProductController extends Controller
     }
 
     // 商品陣列組合
-    public function productArray($productsMain)
+    public function productArray($productsMain,$host)
     {
         $product = array();
         foreach($productsMain as $productMain){
@@ -78,7 +79,20 @@ class ProductController extends Controller
             $productDetail = ProductModel::select_product_detail_with_productId_db($productId);
             // 商品細項塞入商品主檔
             $productMain->productDetail = $productDetail;
-            $product[] = $productMain;
+
+            // 取得商品圖片
+            $productImage = ProductModel::select_product_image_with_productId_db($productId);
+            // 商品細項塞入商品主檔
+            if($productImage){
+                $productMain->productImage = $productImage[0]->image;
+            }else{
+                $productMain->productImage = null;
+            }            
+
+            // 取得圖片host
+            $productMain->host = $host;
+
+            $product[] = $productMain;  
         }
         return $product;
     }
@@ -132,6 +146,10 @@ class ProductController extends Controller
         // 刪除後其餘商品子項排序調整        
         $this->sortArrange(3,'product','categoryId','sort','productId',$productId,$oldIdentify=null,$oldSort=null);
 
+        $filePath = "productImage/" . $productId;
+        // 刪除圖片資料夾 會將裡面圖片一同刪除
+        storage::deleteDirectory("/public/" . $filePath);
+
         ProductModel::delete_product_db($productId);
         return response()->json(['message' => "刪除成功"], Response::HTTP_OK);
     }
@@ -159,6 +177,5 @@ class ProductController extends Controller
         $this->sortArrange(2,'product','categoryId','sort','productId',$productId,$categoryId,$oldSort);
 
         return response()->json(['message' => "改變排序成功"], Response::HTTP_OK);
-    }
-
+    }  
 }

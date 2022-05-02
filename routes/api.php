@@ -9,6 +9,7 @@ use App\Http\Controllers\Category\CategoryController;
 
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\p\Product\ProductDetailController;
+use App\Http\Controllers\p\Product\ProductImageController;
 /************************************ backStage API Contorller************************************ */
 
 
@@ -49,7 +50,9 @@ Route::prefix('product')->group(function () {
     // 上下架
     Route::post('/changeEnable', [App\Http\Controllers\Product\ProductController::class, 'changeEnable'])->name('productChangeEnable');
     // 改變排序
-    Route::post('/changeSort', [App\Http\Controllers\Product\ProductController::class, 'changeSort'])->name('productchangeSort');
+    Route::post('/changeSort', [App\Http\Controllers\Product\ProductController::class, 'changeSort'])->name('productChangeSort');
+    // 上傳圖片
+    Route::post('/uploadImage', [App\Http\Controllers\Product\ProductController::class, 'uploadImage'])->name('productUploadImage');
 });
 
 // 商品子項 productDetail
@@ -65,7 +68,19 @@ Route::prefix('productDetail')->group(function () {
     // 商品子項上下架
     Route::post('/changeEnable', [App\Http\Controllers\Product\ProductDetailController::class, 'changeEnable'])->name('productDetailChangeEnable');
     // 改變排序
-    Route::post('/changeSort', [App\Http\Controllers\Product\ProductDetailController::class, 'changeSort'])->name('productDetailchangeSort');
+    Route::post('/changeSort', [App\Http\Controllers\Product\ProductDetailController::class, 'changeSort'])->name('productDetailChangeSort');
+});
+
+// 商品圖片 productImage
+Route::prefix('productImage')->group(function () {
+    // 取得商品圖片
+    Route::post('/', [App\Http\Controllers\Product\ProductImageController::class, 'productImage'])->name('productImage');
+    // 商品圖片上傳
+    Route::post('/upload', [App\Http\Controllers\Product\ProductImageController::class, 'upload'])->name('productImageUpload');
+    // 商品圖片刪除
+    Route::post('/delete', [App\Http\Controllers\Product\ProductImageController::class, 'delete'])->name('productImageDelete');
+    // 改變排序
+    Route::post('/changeSort', [App\Http\Controllers\Product\ProductImageController::class, 'changeSort'])->name('productImageChangeSort');
 });
 /***************************************product************************************* */
 

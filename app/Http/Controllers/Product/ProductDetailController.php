@@ -43,7 +43,7 @@ class ProductDetailController extends Controller
         $productId = $request->productId;
         $producCount = ProductDetailModel::select_product_detail_with_productId_db($productId);
         $productDetail['sort'] = count($producCount) + 1;
-        
+                
         $productDetail['productDetailId'] = $this->randomString(13);
         $productDetail['taxType'] = 1;
         $productDetail['unitPriceNoTax'] = $caculateTax['unitPriceNoTax'];
