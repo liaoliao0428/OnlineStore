@@ -169,5 +169,6 @@ trait ToolTrait
     public function defineHostName(Request $request)
     {
         $host = $request->getSchemeAndHttpHost();
+        return $host;
     }
 }

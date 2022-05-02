@@ -139,16 +139,14 @@
             return null
         }
 
-        let response = await axios.post("{{route('productchangeSort')}}",{
+        let response = await axios.post("{{route('productChangeSort')}}",{
             'productId': productId,
             'newSort': newSort,
             'oldSort': oldSort
         })
         productHtmlInsert()
     }
-
-
-
+    
     /**************************************抓商品************************************ */
     // 撈此分類全部商品資料
     const getProduct = async () => {
@@ -191,6 +189,11 @@
             let productDetails = product.productDetail
             let sort = product.sort
 
+            let host = product.host
+            let productImage = product.productImage
+            let image = ``
+            productImage ? image = `${host}/OnlineStore/storage/app/public/productImage/${productId}/${productImage}` : null
+
             // let htmlBody = await productBodyHtml(productDetails)
             let htmlBody = ``
             productDetails.forEach((productDetail, productDetailIndex) => {
@@ -218,7 +221,7 @@
                         <!-- 排序 -->
                         <th scope="row" style="font-size: 3rem;">${productIndex+1}</th>
                         <!-- 商品圖 -->
-                        <td><img src="" height="200"></td>
+                        <td><img src="${image}" height="200"></td>
                         <!-- 商品 - 商品名稱 -->
                         <td class="row m-0 p-0 align-items-start flex-grow-1 border-0">
                             <div class="row m-0 p-0 align-items-start">

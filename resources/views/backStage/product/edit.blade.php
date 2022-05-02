@@ -3,6 +3,7 @@
 @section('head')
 @endsection
 @section('content')
+
 <div class="bg-white p-3">
     <!--breadcrumb-->
     <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
@@ -23,15 +24,15 @@
         <div class="col-5">
             <div class="card ">
                 <div class="card-body">
-                    <div class="col-12 d-flex">                    
+                    <div class="col-12 d-flex border-bottom">
                         <label for="inputFirstName" class="form-label col-7 fs-2 d-flex justify-content-end">商品資料</label>
                         <div class="col-2"></div>
-                        <button class="btn btn-outline-danger px-5 my-2 col-3" onclick="deleteProductConfirm()"><i class='bx bx-trash mr-1'></i>刪除</button>
+                        <button class="btn btn-outline-danger my-2 col-3" onclick="deleteProductConfirm()"><i class='bx bx-trash mr-1'></i>刪除</button>
                     </div>
-                    <div class="col-12">
+                    <div class="col-12 mt-2">
                         <label for="productName" class="form-label fs-4">商品名稱</label>
                         <input type="hidden" name="productId" id="productId">
-                        <input type="" name="oldSort" id="oldSort">
+                        <input type="hidden" name="oldSort" id="oldSort">
                         <input id="productName" name="productName" class="form-control">
                     </div>
                     <div class="col-12 mt-3">
@@ -52,7 +53,7 @@
                             </div>
                         </div>
                         <div class="col-4 d-flex justify-content-end">
-                            <button class="btn btn-outline-primary px-5" onclick="updateProduct()"><i class='bx bx-cloud-upload mr-1'></i>更新</button>
+                            <button class="btn btn-outline-primary px-5" onclick="updateProduct()"><i class='bx bx-edit mr-1'></i>更新</button>
                         </div>
                     </div>
                 </div>
@@ -62,21 +63,11 @@
         <div class=" col-7">
             <div class="card">
                 <div class="card-body">
-                    <label for="inputFirstName" class="form-label fs-2 d-flex justify-content-center">商品圖片</label>
-                    <div class="col-12">
-                        <label for="inputFirstName" class="form-label fs-4">商品名稱</label>
-                        <input type="email" class="form-control" id="inputFirstName">
+                    <div class="col-12 d-flex border-bottom">
+                        <label for="inputFirstName" class="form-label col-12 fs-2 d-flex justify-content-center">商品圖片</label>
                     </div>
-                    <div class="col-12 mt-3">
-                        <label for="inputLastName" class="form-label fs-4">商品分類</label>
-                        <select class="form-select" name="category" id="category" onchange=changeSize()>
-                            <option value="United States">United States</option>
-                        </select>
-                    </div>
-                    <div class="col-12 mt-3">
-                        <label for="inputEmail" class="form-label fs-4">商品描述</label>
-                        <textarea type="textarea" class="form-control" id="inputEmail"></textarea>
-                    </div>
+                    <table class="table table-bordered mt-4" id="productImage">
+                    </table>
                 </div>
             </div>
         </div>
@@ -157,7 +148,7 @@
         url = url.replace(':categoryId', categoryId)
         location.href = url;
     }
-    
+
 /********************************************************************商品相關******************************************************************************* */
 
     /**************************************抓分類************************************ */
@@ -235,9 +226,9 @@
         });
 
         // 商品名稱驗證
-        if(!productName){
+        if (!productName) {
             alert('商品名稱不可空白')
-            return false 
+            return false
         }
 
         if (response) {
@@ -254,9 +245,9 @@
     const deleteProductConfirm = () => {
         let productId = $('input#productId').val()
         let check = confirm('確定刪除商品，所有資料將會遺失？');
-        if(check){
+        if (check) {
             deleteProduct(productId)
-        }else{
+        } else {
             return false
         }
     }
@@ -264,24 +255,167 @@
     // 商品刪除
     const deleteProduct = async (productId) => {
         // 打axios刪除
-        let response = await axios.post("{{route('productDelete')}}", {'productId': productId});
-        if(response){
+        let response = await axios.post("{{route('productDelete')}}", {
+            'productId': productId
+        });
+        if (response) {
             alert(response.data.message)
             await backToProductIndex()
-        }        
+        }
     }
-    /**************************************商品刪除************************************ */   
+    /**************************************商品刪除************************************ */
 
     // 商上下架
     const changeProductEnable = async () => {
         $(`input#enable:checked`).val() ? $(`input#enable`).val(1) : $(`input#enable`).val(0)
         let productId = $('input#productId').val()
         let enable = $(`input#enable`).val()
-        let response =  await axios.post("{{route('productChangeEnable')}}",{'productId': productId,'enable': enable});  
-    }    
+        let response = await axios.post("{{route('productChangeEnable')}}", {
+            'productId': productId,
+            'enable': enable
+        });
+    }
 /********************************************************************商品相關******************************************************************************* */
 
-/********************************************************************商品子項相關******************************************************************************* */    
+/********************************************************************商品圖片相關******************************************************************************* */
+    // 上傳圖片
+    const uploadImage = async (productId,i) => {
+        let formData = new FormData($("#uploadForm")[0]) //创建一个forData
+        let productImage = "input#productImage_" + i
+        formData.append('productImage', $(productImage)[0].files[0]) //把file添加进去  name命名为img
+        formData.append('productId', productId) //把file添加进去  name命名为img
+
+        $.ajax({
+            url: "{{route('productImageUpload')}}",
+            type: "post",
+            data: formData,
+            processData: false, // 告诉jQuery不要去处理发送的数据
+            contentType: false, // 告诉jQuery不要去设置Content-Type请求头
+            dataType: 'text',
+            success: function(data) {
+                productImageTableHtmlInsert()
+                console.log(data);
+            }
+        })
+    }
+
+    // 改變排序
+    const changeProductImageSort = async (productId,imageId, newSort, oldSort, imageCount) => {
+        if (newSort <= 0 || newSort > imageCount) {
+            return null
+        }
+        let response = await axios.post("{{route('productImageChangeSort')}}", {
+            'productId': productId,
+            'imageId': imageId,
+            'newSort': newSort,
+            'oldSort': oldSort
+        })
+        await productImageTableHtmlInsert()
+    }
+
+    /**************************************商品圖片刪除************************************ */
+    // 商品圖片刪除確認
+    const deleteProductImageConfirm = async (productId,imageId,image) => {
+        let check = confirm('商品圖片將被刪除');
+        if (check) {
+            deleteProductImage(productId,imageId,image)
+        } else {
+            return false
+        }
+    }
+
+    // 商品圖片刪除
+    const deleteProductImage = async (productId,imageId,image) => {
+    // 打axios刪除
+    let response = await axios.post("{{route('productImageDelete')}}", {
+            'productId': productId,
+            'imageId': imageId,
+            'image': image
+        });
+        if (response) {
+            console.log(response);
+            await productImageTableHtmlInsert()
+        }
+    }
+    /**************************************商品圖片刪除************************************ */    
+
+    // 撈圖片資料
+    const getProductImage = async (productId) => {
+        let response = await axios.post("{{route('productImage')}}",{
+            'productId': productId
+        })
+        return response.data.productImage
+    }    
+
+    //  取名叫productImageTableHtml就會有非同步問題 
+    const productImageTableHtml = async () => {
+        let productId = await getProductIdFromUrl()
+        let productImages = await getProductImage(productId)
+        let td = []
+
+        for(i=0;i<8;i++){
+            if(productImages[i]){
+                let imageId = productImages[i].imageId
+                let image = productImages[i].image
+                let sort = productImages[i].sort
+                let host = productImages.host
+                let imageCount = productImages.imageCount
+
+                td[i] = `<img src="${host}/OnlineStore/storage/app/public/productImage/${productId}/${image}" height="140">
+                         <div class="d-flex justify-content-center">
+                             <button class="btn btn-outline-secondary mt-2 mx-auto col-3" onclick="changeProductImageSort('${productId}','${imageId}','${sort-1}','${sort}','${imageCount}')"><i class='bx bx-caret-up-circle mx-0'></i></button>
+                             <button class="btn btn-outline-secondary mt-2 mx-auto col-3" onclick="changeProductImageSort('${productId}','${imageId}','${sort+1}','${sort}','${imageCount}')"><i class='bx bx-caret-down-circle mx-0'></i></button>
+                             <button class="btn btn-outline-danger mt-2 mx-auto col-3" onclick="deleteProductImageConfirm('${productId}','${imageId}','${image}')"><i class='bx bx-trash mx-0'></i></button>
+                         </div>`
+            }else{
+                td[i] = `<label class="btn btn-outline-success mt-5">
+                            <form enctype="multipart/form-data" id="uploadForm">
+                                <input id="productImage_${i}" name="productImage_${i}" type="file" style="display: none;" onchange="uploadImage('${productId}',${i})">
+                            </form>
+                            <i class='bx bx-cloud-upload mr-1'></i>上傳圖片
+                        </label>`
+            }
+        }
+
+        let html = `<tbody class="text-center align-center">
+                        <tr>
+                            <th scope="col" width="25%">1</th>
+                            <th scope="col" width="25%">2</th>
+                            <th scope="col" width="25%">3</th>
+                            <th scope="col" width="25%">4</th>
+                        </tr>
+                        <tr>
+                            <td>${td[0]}</td>
+                            <td>${td[1]}</td>
+                            <td>${td[2]}</td>
+                            <td>${td[3]}</td>
+                        </tr>
+                        <tr>
+                            <th scope="col" width="25%">5</th>
+                            <th scope="col" width="25%">6</th>
+                            <th scope="col" width="25%">7</th>
+                            <th scope="col" width="25%">8</th>
+                        </tr>
+                        <tr>
+                            <td>${td[4]}</td>
+                            <td>${td[5]}</td>
+                            <td>${td[6]}</td>
+                            <td>${td[7]}</td>
+                        </tr>
+                    </tbody>`
+        return html
+    }
+
+    // 商品圖片table html塞入
+    const productImageTableHtmlInsert = async () => {
+        let html = await productImageTableHtml()
+        $("table#productImage").html(html)
+    }
+
+    productImageTableHtmlInsert()    
+/********************************************************************商品圖片相關******************************************************************************* */
+
+/********************************************************************商品子項相關******************************************************************************* */
     // 新增商品子項
     const insertProductDetail = async () => {
         let productId = $('input#productId').val()
@@ -291,25 +425,25 @@
         let quantity = $('input#quantity').val()
 
         // 商品子項名稱驗證
-        if(!productDetailName){
+        if (!productDetailName) {
             alert('品名不可空白')
-            return false 
+            return false
         }
 
         // 規格驗證
-        if(!specification){
+        if (!specification) {
             alert('規格不可空白')
-            return false 
+            return false
         }
 
         // 單價驗證
-        if(unitPrice < 0){
+        if (unitPrice < 0) {
             alert('單價錯誤')
             return false
         }
 
         // 數量驗證
-        if(quantity <0){
+        if (quantity < 0) {
             alert('數量錯誤')
             return false
         }
@@ -321,7 +455,7 @@
             'unitPrice': Number(unitPrice),
             'quantity': Number(quantity)
         })
-        if(response){
+        if (response) {
             window.location.reload()
         }
     }
@@ -334,37 +468,37 @@
         let quantity = $(`input#${productDetailId}_quantity`).val()
 
         // 商品子項名稱驗證
-        if(!productDetailName){
+        if (!productDetailName) {
             alert('品名不可空白')
-            return false 
+            return false
         }
 
         // 規格驗證
-        if(!specification){
+        if (!specification) {
             alert('規格不可空白')
-            return false 
+            return false
         }
 
         // 單價驗證
-        if(unitPrice < 0){
+        if (unitPrice < 0) {
             alert('單價錯誤')
             return false
         }
 
         // 數量驗證
-        if(quantity <0){
+        if (quantity < 0) {
             alert('數量錯誤')
             return false
         }
 
-        let response = await axios.post("{{route('productDetailUpdate')}}",{
+        let response = await axios.post("{{route('productDetailUpdate')}}", {
             'productDetailId': productDetailId,
             'productDetailName': productDetailName,
             'specification': specification,
             'unitPrice': Number(unitPrice),
             'quantity': Number(quantity)
         })
-        if(response){
+        if (response) {
             alert("商品子項更新成功")
             productDetailHtmlInsert()
             let modal = '#' + productDetailId + "_edit"
@@ -376,9 +510,9 @@
     // 商品刪除確認
     const deleteProductDetailConfirm = (productDetailId) => {
         let check = confirm('確定刪除商品子項，所有資料將會遺失？');
-        if(check){
+        if (check) {
             deleteProductDetail(productDetailId)
-        }else{
+        } else {
             return false
         }
     }
@@ -386,11 +520,13 @@
     // 商品子項刪除
     const deleteProductDetail = async (productDetailId) => {
         // 打axios刪除
-        let response = await axios.post("{{route('productDetailDelete')}}", {'productDetailId': productDetailId});
-        if(response){
+        let response = await axios.post("{{route('productDetailDelete')}}", {
+            'productDetailId': productDetailId
+        });
+        if (response) {
             alert(response.data.message)
             productDetailHtmlInsert()
-        }        
+        }
     }
     /**************************************商品子項刪除************************************ */
 
@@ -398,15 +534,18 @@
     const changeProductDetailEnable = async (productDetailId) => {
         $(`input#${productDetailId}_enable:checked`).val() ? $(`input#${productDetailId}_enable`).val(1) : $(`input#${productDetailId}_enable`).val(0)
         let enable = $(`input#${productDetailId}_enable`).val()
-        let response =  await axios.post("{{route('productDetailChangeEnable')}}",{'productDetailId': productDetailId,'enable': enable});
+        let response = await axios.post("{{route('productDetailChangeEnable')}}", {
+            'productDetailId': productDetailId,
+            'enable': enable
+        });
     }
 
     // 改變排序
-    const changeProductDetailSort = async (productDetailId,newSort,oldSort,productDetailsCount) => {
-        if(newSort <= 0 || newSort > productDetailsCount){
+    const changeProductDetailSort = async (productDetailId, newSort, oldSort, productDetailsCount) => {
+        if (newSort <= 0 || newSort > productDetailsCount) {
             return null
         }
-        let response = await axios.post("{{route('productDetailchangeSort')}}",{
+        let response = await axios.post("{{route('productDetailChangeSort')}}", {
             'productDetailId': productDetailId,
             'newSort': newSort,
             'oldSort': oldSort
@@ -416,7 +555,7 @@
 
     /**************************************產出productDetail的HTML並塞入************************************ */
     // 抓productDetail 資料
-    const getProductDetail = async () =>{
+    const getProductDetail = async () => {
         let productId = await getProductIdFromUrl()
         let response = await axios.post("{{route('productDetail')}}", {
             'productId': productId
@@ -425,13 +564,13 @@
     }
 
     // 產出productDetail 資料
-    const productDetailHtml = async (productDetails) =>{
+    const productDetailHtml = async (productDetails) => {
         let html = ``
-        if(productDetails === "無資料"){
+        if (productDetails === "無資料") {
             return html
         }
         let productDetailsCount = productDetails.length
-        productDetails.forEach((productDetail,key)=>{
+        productDetails.forEach((productDetail, key) => {
             let productDetailId = productDetail.productDetailId
             let productDetailName = productDetail.productDetailName
             let specification = productDetail.specification
@@ -441,9 +580,9 @@
             let sort = productDetail.sort
 
             let enableHtml = ``
-            if(enable == 1){
+            if (enable == 1) {
                 enableHtml = `<input id="${productDetailId}_enable" name="${productDetailId}_enable" class="form-check-input m-0" type="checkbox" onclick="changeProductDetailEnable('${productDetailId}')" checked>`
-            }else{
+            } else {
                 enableHtml = `<input id="${productDetailId}_enable" name="${productDetailId}_enable" class="form-check-input m-0" type="checkbox" onclick="changeProductDetailEnable('${productDetailId}')">`
             }
 
@@ -453,7 +592,7 @@
                             <div class="col-12 d-flex">
                                 <label for="index" class="form-label fs-2 d-flex justify-content-start col-8">品項${key+1}</label>
                                 <div class="col-4 d-flex justify-content-end my-3 ms-2">
-                                    <button class="btn btn-outline-primary px-5 me-2" data-bs-toggle="modal" data-bs-target="#${productDetailId}_edit" ><i class='bx bx-cloud-upload mr-1'></i>編輯</button>
+                                    <button class="btn btn-outline-primary px-5 me-2" data-bs-toggle="modal" data-bs-target="#${productDetailId}_edit" ><i class='bx bx-edit mr-1'></i></i>編輯</button>
                                     <button class="btn btn-outline-danger px-5" onclick="deleteProductDetailConfirm('${productDetailId}')"><i class='bx bx-trash mr-1'></i>刪除</button>
                                 </div>
                                 <!-- 新增子項彈窗 -->
@@ -532,20 +671,18 @@
                     </div>
                     <!-- 品項${key+1} -->`
         })
-        return  html
+        return html
     }
 
     // 產出productDetail的HTML並塞入
-    const productDetailHtmlInsert = async () =>{
+    const productDetailHtmlInsert = async () => {
         let productDetails = await getProductDetail()
         let html = await productDetailHtml(productDetails)
         $("#productDetail").html(html)
     }
     productDetailHtmlInsert()
     /**************************************產出productDetail的HTML並塞入************************************ */
-
-/********************************************************************商品子項相關******************************************************************************* */    
-
+/********************************************************************商品子項相關******************************************************************************* */
 </script>
 
 @endsection
