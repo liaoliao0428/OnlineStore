@@ -1,5 +1,9 @@
 $(function() {
 	"use strict";
+	
+	console.log('app');
+
+
 	new PerfectScrollbar(".header-message-list"), new PerfectScrollbar(".header-notifications-list"), $(".mobile-search-icon").on("click", function() {
 		$(".search-bar").addClass("full-search-bar")
 	}), $(".search-close").on("click", function() {
@@ -7,7 +11,8 @@ $(function() {
 	}), $(".mobile-toggle-menu").on("click", function() {
 		$(".wrapper").addClass("toggled")
 	}), $(".toggle-icon").click(function() {
-		$(".wrapper").hasClass("toggled") ? ($(".wrapper").removeClass("toggled"), $(".sidebar-wrapper").unbind("hover")) : ($(".wrapper").addClass("toggled"), $(".sidebar-wrapper").hover(function() {
+		$(".wrapper").hasClass("toggled") ? ($(".wrapper").removeClass("toggled"), $(".sidebar-wrapper").unbind("hover")) : ($(".wrapper").addClass("toggled"),
+		 $(".sidebar-wrapper").hover(function() {
 			$(".wrapper").addClass("sidebar-hovered")
 		}, function() {
 			$(".wrapper").removeClass("sidebar-hovered")
@@ -21,9 +26,9 @@ $(function() {
 			}, 600), !1
 		})
 	}), $(function() {
-		for (var e = window.location, o = $(".metismenu li a").filter(function() {
-				return this.href == e
-			}).addClass("").parent().addClass("mm-active"); o.is("li");) o = o.parent("").addClass("mm-show").parent("").addClass("mm-active")
+		// for (var e = window.location, o = $(".metismenu li a").filter(function() {
+		// 		return this.href == e
+		// 	}).addClass("").parent().addClass("mm-active"); o.is("li");) o = o.parent("").addClass("mm-show").parent("").addClass("mm-active")
 	}), $(function() {
 		$("#menu").metisMenu()
 	}), $(".chat-toggle-btn").on("click", function() {
@@ -119,6 +124,12 @@ $(function() {
 
 
 
-
-
 });
+
+// window.API_URL = 'http://192.168.0.59/';
+window.API_URL = "https://dali-mart.com/";
+window.API_FOLDER = 'dalimarket/public/api/';
+window.FOLDER = "dalimarket/public/";
+window.ImageRoot = "dalimarket/storage/app/public/";
+
+console.log(`1223123123123`);
