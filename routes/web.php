@@ -7,7 +7,10 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Category\CategoryController;
 
 use App\Http\Controllers\Product\ProductController;
-use App\Http\Controllers\p\Product\ProductDetailController;
+use App\Http\Controllers\Product\ProductDetailController;
+
+use App\Http\Controllers\Order\OrderController;
+
 /************************************ backStage API Contorller************************************ */
 
 /*
@@ -53,4 +56,10 @@ Route::prefix('product')->group(function () {
     Route::get('/edit/{productId}', [App\Http\Controllers\Product\ProductController::class, 'edit'])->name('productEdit');
     // 商品新增寫入
     Route::post('/insert', [App\Http\Controllers\Product\ProductController::class, 'insert'])->name('productInsert');
+});
+
+// 商品
+Route::prefix('order')->group(function () {
+    //首頁
+    Route::get('/index', [App\Http\Controllers\Order\OrderController::class, 'index'])->name('orderIndex');
 });
