@@ -36,6 +36,12 @@ class ProductImageModel
         return DB::select("SELECT * FROM product_image WHERE productId = '$productId' ORDER BY sort");
     }
 
+    // 取得商品圖片
+    public static function select_product_image_with_productId_one_db($productId)
+    {
+        return DB::select("SELECT image FROM product_image WHERE productId = '$productId' ORDER BY sort ASC LIMIT 1");
+    }
+
     // 商品圖片資訊寫入
     public static function insert_product_image_db($productImage)
     {

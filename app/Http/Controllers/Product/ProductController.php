@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
-use App\Models\ProductModel;
 use App\Http\Traits\ToolTrait;
 use App\Http\Traits\SortTrait;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Storage;
+
+use App\Models\ProductModel;
+use App\Models\ProductDetailModel;
+use App\Models\ProductImageModel;
 
 class ProductController extends Controller
 {
@@ -76,12 +79,12 @@ class ProductController extends Controller
         foreach($productsMain as $productMain){
             $productId = $productMain->productId;
             // 取得商品細項
-            $productDetail = ProductModel::select_product_detail_with_productId_db($productId);
+            $productDetail = ProductDetailModel::select_product_detail_with_productId_db($productId);
             // 商品細項塞入商品主檔
             $productMain->productDetail = $productDetail;
 
             // 取得商品圖片
-            $productImage = ProductModel::select_product_image_with_productId_db($productId);
+            $productImage = ProductImageModel::select_product_image_with_productId_one_db($productId);
             // 商品細項塞入商品主檔
             if($productImage){
                 $productMain->productImage = $productImage[0]->image;

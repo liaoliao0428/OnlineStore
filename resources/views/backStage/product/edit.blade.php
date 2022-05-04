@@ -368,7 +368,7 @@
                              <button class="btn btn-outline-danger mt-2 mx-auto col-3" onclick="deleteProductImageConfirm('${productId}','${imageId}','${image}')"><i class='bx bx-trash mx-0'></i></button>
                          </div>`
             }else{
-                td[i] = `<label class="btn btn-outline-success mt-5">
+                td[i] = `<label class="btn btn-outline-success">
                             <form enctype="multipart/form-data" id="uploadForm">
                                 <input id="productImage_${i}" name="productImage_${i}" type="file" style="display: none;" onchange="uploadImage('${productId}',${i})">
                             </form>
@@ -385,10 +385,10 @@
                             <th scope="col" width="25%">4</th>
                         </tr>
                         <tr>
-                            <td>${td[0]}</td>
-                            <td>${td[1]}</td>
-                            <td>${td[2]}</td>
-                            <td>${td[3]}</td>
+                            <td style="vertical-align: middle;">${td[0]}</td>
+                            <td style="vertical-align: middle;">${td[1]}</td>
+                            <td style="vertical-align: middle;">${td[2]}</td>
+                            <td style="vertical-align: middle;">${td[3]}</td>
                         </tr>
                         <tr>
                             <th scope="col" width="25%">5</th>
@@ -397,10 +397,10 @@
                             <th scope="col" width="25%">8</th>
                         </tr>
                         <tr>
-                            <td>${td[4]}</td>
-                            <td>${td[5]}</td>
-                            <td>${td[6]}</td>
-                            <td>${td[7]}</td>
+                            <td style="vertical-align: middle;">${td[4]}</td>
+                            <td style="vertical-align: middle;">${td[5]}</td>
+                            <td style="vertical-align: middle;">${td[6]}</td>
+                            <td style="vertical-align: middle;">${td[7]}</td>
                         </tr>
                     </tbody>`
         return html
