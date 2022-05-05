@@ -3,6 +3,9 @@
 @section('head')
 @endsection
 @section('content')
+<style>
+
+</style>
 <div class="bg-white p-3">
     <!--breadcrumb-->
     <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
@@ -18,8 +21,9 @@
     </div>
     <hr />
     <div class="col-12 row m-0 my-3">
-        <div class="col-3">
-            <p>123</p>
+        <!-- 時間選擇 -->
+        <div class="col-3 d-flex align-items-center justify-content-start">
+            <input type="date">
         </div>
         <div class="col-9 d-flex p-0">
             <div class="col-2">
@@ -49,24 +53,59 @@
             <!-- 訂單列表 -->
             <table class="table table-bordered mb-0" id="product">
                 <!-- 外框欄位 -->
-                <thead >
+                <thead>
                     <tr>
-                        <th scope="col" width="15%" class="text-center fs-4">訂單編號</th>
-                        <th scope="col" width="20%" class="text-center fs-4">金額</th>
-                        <th scope="col" width="20%" class="text-center fs-4">付款方式</th>
-                        <th scope="col" width="10%" class="text-center fs-4">付款狀態</th>
-                        <th scope="col" width="10%" class="text-center fs-4">狀態</th>
-                        <th scope="col" width="25%" class="text-center fs-4">操作</th>
+                        <th scope="col" width="12%" class="text-center fs-4">訂單編號</th>
+                        <th scope="col" width="16%" class="text-center fs-4">下單日期</th>
+                        <th scope="col" width="11%" class="text-center fs-4">金額</th>
+                        <th scope="col" width="11%" class="text-center fs-4">付款方式</th>
+                        <th scope="col" width="11%" class="text-center fs-4">付款狀態</th>
+                        <th scope="col" width="11%" class="text-center fs-4">訂單狀態</th>
+                        <th scope="col" width="11%" class="text-center fs-4">物流</th>
+                        <th scope="col" width="17%" class="text-center fs-4">操作</th>
                     </tr>
                 </thead>
-                <!-- 表格內容 -->
-                <tbody id="productData">
-                    <th class="text-center" scope="row">1</th>
-                    <td class="text-center">Mark</td>
-                    <td class="text-center">Otto</td>
-                    <td class="text-center">@mdo</td>
-                    <td class="text-center">@mdo</td>
-                    <td class="text-center">@mdo</td>
+                <!-- 訂單內容 -->
+                <tbody id="order" class="align-middle text-center">
+                    <tr>
+                        <th scope="row">111111111111</th>
+                        <td>2022-05-06 12:00:00</td>
+                        <td>$100000</td>
+                        <td>綠界金流</td>
+                        <td>未付款</td>
+                        <td>訂單成立</td>
+                        <td>7-11</td>
+                        <!-- 詳情按鈕 -->
+                        <td>
+                            <button type="button" class="btn btn-outline-primary d-block mx-auto" ><i class='bx bx-edit mr-1'></i>詳情</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">111111111111</th>
+                        <td>2022-05-06 12:00:00</td>
+                        <td>$100000</td>
+                        <td>綠界金流</td>
+                        <td>未付款</td>
+                        <td>訂單成立</td>
+                        <td>7-11</td>
+                        <!-- 詳情按鈕 -->
+                        <td>
+                            <button type="button" class="btn btn-outline-primary d-block mx-auto" ><i class='bx bx-edit mr-1'></i>詳情</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">111111111111</th>
+                        <td>2022-05-06 12:00:00</td>
+                        <td>$100000</td>
+                        <td>綠界金流</td>
+                        <td>未付款</td>
+                        <td>訂單成立</td>
+                        <td>7-11</td>
+                        <!-- 詳情按鈕 -->
+                        <td>
+                            <button type="button" class="btn btn-outline-primary d-block mx-auto" ><i class='bx bx-edit mr-1'></i>詳情</button>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>

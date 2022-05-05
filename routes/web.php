@@ -58,8 +58,10 @@ Route::prefix('product')->group(function () {
     Route::post('/insert', [App\Http\Controllers\Product\ProductController::class, 'insert'])->name('productInsert');
 });
 
-// 商品
+// 訂單
 Route::prefix('order')->group(function () {
-    //首頁
+    // 首頁
     Route::get('/index', [App\Http\Controllers\Order\OrderController::class, 'index'])->name('orderIndex');
+    // 詳情
+    Route::get('/detail', [App\Http\Controllers\Order\OrderController::class, 'detail'])->name('orderDetail');
 });

@@ -25,5 +25,11 @@ class OrderController extends Controller
         return view('backstage.order.index'); 
     }
 
+    // 訂單詳情
+    public function detail()
+    {
+        return view('backstage.order.detail'); 
+    }
+
 
 }
