@@ -56,8 +56,8 @@
                 <thead>
                     <tr>
                         <th scope="col" width="12%" class="text-center fs-4">訂單編號</th>
-                        <th scope="col" width="16%" class="text-center fs-4">下單日期</th>
-                        <th scope="col" width="11%" class="text-center fs-4">金額</th>
+                        <th scope="col" width="16%" class="text-center fs-4">訂單日期</th>
+                        <th scope="col" width="11%" class="text-center fs-4">訂單金額</th>
                         <th scope="col" width="11%" class="text-center fs-4">付款方式</th>
                         <th scope="col" width="11%" class="text-center fs-4">付款狀態</th>
                         <th scope="col" width="11%" class="text-center fs-4">訂單狀態</th>
@@ -77,7 +77,7 @@
                         <td>7-11</td>
                         <!-- 詳情按鈕 -->
                         <td>
-                            <button type="button" class="btn btn-outline-primary d-block mx-auto" ><i class='bx bx-edit mr-1'></i>詳情</button>
+                            <a href="{{route('orderDetail')}}" type="button" class="btn btn-outline-primary  mx-auto" ><i class='bx bx-edit mr-1'></i>詳情</a>
                         </td>
                     </tr>
                     <tr>
@@ -90,7 +90,7 @@
                         <td>7-11</td>
                         <!-- 詳情按鈕 -->
                         <td>
-                            <button type="button" class="btn btn-outline-primary d-block mx-auto" ><i class='bx bx-edit mr-1'></i>詳情</button>
+                            <a href="{{route('orderDetail')}}" type="button" class="btn btn-outline-primary  mx-auto" ><i class='bx bx-edit mr-1'></i>詳情</a>
                         </td>
                     </tr>
                     <tr>
@@ -103,7 +103,7 @@
                         <td>7-11</td>
                         <!-- 詳情按鈕 -->
                         <td>
-                            <button type="button" class="btn btn-outline-primary d-block mx-auto" ><i class='bx bx-edit mr-1'></i>詳情</button>
+                            <a href="{{route('orderDetail')}}" type="button" class="btn btn-outline-primary mx-auto" ><i class='bx bx-edit mr-1'></i>詳情</a>
                         </td>
                     </tr>
                 </tbody>

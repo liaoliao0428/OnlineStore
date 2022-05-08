@@ -10,6 +10,9 @@ use App\Http\Traits\SortTrait;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Storage;
 
+use Ecpay\Sdk\Factories\Factory;
+
+
 use App\Models\ProductModel;
 use App\Models\ProductDetailModel;
 use App\Models\ProductImageModel;
