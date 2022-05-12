@@ -23,26 +23,26 @@
     <div class="col-12 row m-0 my-3">
         <!-- 時間選擇 -->
         <div class="col-3 d-flex align-items-center justify-content-start">
-            <input type="date">
+            <input id="date" type="date">
         </div>
         <div class="col-9 d-flex p-0">
             <div class="col-2">
-                <button class="btn btn-outline-success" style="width: 90%;">訂單成立</button>
+                <button id="button_1" class="btn btn-outline-success active" style="width: 90%;" onclick="changeButtonClass('button_1')">訂單成立</button>
             </div>
             <div class="col-2">
-                <button class="btn btn-outline-success" style="width: 90%;">處理中</button>
+                <button id="button_2" class="btn btn-outline-success" style="width: 90%;" onclick="changeButtonClass('button_2')">處理中</button>
             </div>
             <div class="col-2">
-                <button class="btn btn-outline-success" style="width: 90%;">已出貨</button>
+                <button id="button_3" class="btn btn-outline-success" style="width: 90%;" onclick="changeButtonClass('button_3')">已出貨</button>
             </div>
             <div class="col-2">
-                <button class="btn btn-outline-success" style="width: 90%;">已送達</button>
+                <button id="button_4" class="btn btn-outline-success" style="width: 90%;" onclick="changeButtonClass('button_4')">已送達</button>
             </div>
             <div class="col-2">
-                <button class="btn btn-outline-success" style="width: 90%;">訂單完成</button>
+                <button id="button_5" class="btn btn-outline-success" style="width: 90%;" onclick="changeButtonClass('button_5')">訂單完成</button>
             </div>
             <div class="col-2">
-                <button class="btn btn-outline-success" style="width: 90%;">訂單取消/退貨</button>
+                <button id="button_6" class="btn btn-outline-success" style="width: 90%;" onclick="changeButtonClass('button_6')">訂單取消/退貨</button>
             </div>
         </div>
     </div>
@@ -117,7 +117,19 @@
 @section('script')
 
 <script>
+    let today = new Date();
+    let year = today.getFullYear()
+    let month = (today.getMonth()+1) < 10 ? '0' + (today.getMonth()+1) : today.getMonth()
+    let day = today.getDate() < 10 ? '0' + today.getDate() : today.getDate() 
+    let date = year + '-' + month + '-' + day
+    $("#date").val(date)
 
+    // 改變訂單狀態按鈕樣式
+    const changeButtonClass = (button) => {
+        for(i = 1;i < 7;i++){
+            $(`#button_${i}`).removeClass("active")
+        }        
+        $(`#${button}`).addClass("active")
+    }
 </script>
-
 @endsection
