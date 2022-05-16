@@ -21,12 +21,12 @@
     <div class="row">
         <div class="col-4 row">
             <div class="col-6">
-                <select class="form-select radius-30 " name="category" id="category" onchange="changeCategory()">
+                <select class="form-select " name="category" id="category" onchange="changeCategory()">
                 </select>
             </div>
         </div>
         <div class="col-8 text-end">
-            <button class="btn btn-outline-success px-5 mb-3 radius-30" onclick="addProduct()"><i class='bx bx-cloud-upload mr-1'></i>新增商品</button>
+            <button class="btn btn-outline-success px-5 mb-3 " onclick="addProduct()"><i class='bx bx-cloud-upload mr-1'></i>新增商品</button>
         </div>
     </div>
 

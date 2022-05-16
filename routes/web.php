@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 /************************************ backStage API Contorller************************************ */
 use App\Http\Controllers\Admin\AdminController;
+
 use App\Http\Controllers\Category\CategoryController;
 
 use App\Http\Controllers\Product\ProductController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Product\ProductDetailController;
 
 use App\Http\Controllers\Order\OrderController;
 
+use App\Http\Controllers\Invoice\InvoiceController;
 /************************************ backStage API Contorller************************************ */
 
 /*
@@ -37,31 +39,37 @@ Route::prefix('admin')->group(function () {
     })->name('view.backStage.adminLogin');
 
     //驗證accessToken
-    Route::post('/login', [App\Http\Controllers\Admin\AdminController::class, 'login'])->name('adminlogin');
+    Route::post('/login', [AdminController::class, 'login'])->name('adminlogin');
 
     //首頁
-    Route::get('/index', [App\Http\Controllers\Admin\AdminController::class, 'index'])->name('adimnIndex');
+    Route::get('/index', [AdminController::class, 'index'])->name('adimnIndex');
 
     //登出
-    Route::get('/logout', [App\Http\Controllers\Admin\AdminController::class, 'logout'])->name('adimnLogout');
+    Route::get('/logout', [AdminController::class, 'logout'])->name('adimnLogout');
 });
 
 // 商品
 Route::prefix('product')->group(function () {
     //首頁
-    Route::get('/index/{categoryId}', [App\Http\Controllers\Product\ProductController::class, 'index'])->name('productIndex');
+    Route::get('/index/{categoryId}', [ProductController::class, 'index'])->name('productIndex');
     //新增頁
-    Route::get('/add/{categoryId}', [App\Http\Controllers\Product\ProductController::class, 'add'])->name('productAdd');
+    Route::get('/add/{categoryId}', [ProductController::class, 'add'])->name('productAdd');
     // 編輯頁
-    Route::get('/edit/{productId}', [App\Http\Controllers\Product\ProductController::class, 'edit'])->name('productEdit');
+    Route::get('/edit/{productId}', [ProductController::class, 'edit'])->name('productEdit');
     // 商品新增寫入
-    Route::post('/insert', [App\Http\Controllers\Product\ProductController::class, 'insert'])->name('productInsert');
+    Route::post('/insert', [ProductController::class, 'insert'])->name('productInsert');
 });
 
 // 訂單
 Route::prefix('order')->group(function () {
     // 首頁
-    Route::get('/index', [App\Http\Controllers\Order\OrderController::class, 'index'])->name('orderIndex');
+    Route::get('/index', [OrderController::class, 'index'])->name('orderIndex');
     // 詳情
-    Route::get('/detail', [App\Http\Controllers\Order\OrderController::class, 'detail'])->name('orderDetail');
+    Route::get('/detail', [OrderController::class, 'detail'])->name('orderDetail');
+});
+
+// 發票
+Route::prefix('invoice')->group(function () {
+    // 首頁
+    Route::get('/index', [InvoiceController::class, 'index'])->name('invoiceIndex');
 });
