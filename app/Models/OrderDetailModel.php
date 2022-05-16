@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
-class Category extends Model
+class OrderDetail extends Model
 {
     //指定資料表
-    protected $table = 'category';
+    protected $table = 'order_detail';
 
     //時間戳欄位
     const CREATED_AT = 'createTime';
@@ -21,16 +20,17 @@ class Category extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'categoryId',
-        'categoryName'
+        'orderId',
+        'productDetailId',
+        'unitPrice',
+        'quantity',
+        'amount',
+        'unitPriceNoTax',
+        'taxAmount'
     ];
 }
 
-class CategoryModel
+class OrderDetailModel 
 {
-    //撈全部分類
-    public static function select_category_db()
-    {
-        return DB::select("SELECT categoryId , categoryName FROM category");
-    }
+    
 }

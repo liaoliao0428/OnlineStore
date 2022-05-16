@@ -8,8 +8,11 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Category\CategoryController;
 
 use App\Http\Controllers\Product\ProductController;
-use App\Http\Controllers\p\Product\ProductDetailController;
-use App\Http\Controllers\p\Product\ProductImageController;
+use App\Http\Controllers\Product\ProductDetailController;
+use App\Http\Controllers\Product\ProductImageController;
+
+use App\Http\Controllers\Order\OrderController;
+
 /************************************ backStage API Contorller************************************ */
 
 
@@ -83,5 +86,9 @@ Route::prefix('productImage')->group(function () {
     Route::post('/changeSort', [App\Http\Controllers\Product\ProductImageController::class, 'changeSort'])->name('productImageChangeSort');
 });
 /***************************************product************************************* */
+
+
+
+
 
 

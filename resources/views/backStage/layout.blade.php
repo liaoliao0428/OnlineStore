@@ -65,6 +65,16 @@
                     </ul>
                 </li>
                 <li>
+                    <a href="javascript:;" class="has-arrow">
+                        <div class="parent-icon"><i class="bx bx-category"></i>
+                        </div>
+                        <div class="menu-title">訂單</div>
+                    </a>
+                    <ul>
+                        <li><a href="{{route('orderIndex')}}"><i class="bx bx-right-arrow-alt"></i>訂單管理</a></li>
+                    </ul>
+                </li>
+                <li>
                     <a href="{{route('adimnLogout')}}">
                         <div class="parent-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
