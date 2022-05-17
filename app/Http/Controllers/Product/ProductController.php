@@ -10,9 +10,6 @@ use App\Http\Traits\SortTrait;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Storage;
 
-use Ecpay\Sdk\Factories\Factory;
-
-
 use App\Models\ProductModel;
 use App\Models\ProductDetailModel;
 use App\Models\ProductImageModel;
@@ -166,7 +163,7 @@ class ProductController extends Controller
         $productId = $request->productId;
         $enable = $request->enable;
         ProductModel::update_product_enable_db($productId,$enable);
-        return response()->json(['message' => "上/下架成功"], Response::HTTP_OK);
+        return response()->json(['message' => "上/下架成功"], Response::HTTP_OK); 
     }
 
     // 商品排序調整

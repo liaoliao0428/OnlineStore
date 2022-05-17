@@ -8,17 +8,23 @@ use Ecpay\Sdk\Factories\Factory;
 
 trait InvoiceTrait
 {
+    // 綠界特店編號
+    protected static $MerchantID = "2000132";    
+    // 綠界發票參數
+    protected static $hashKey = "ejCk326UnaZWKisg";
+    protected static $hashIv = "q9jcZX8Ib9LM8wYk";    
+
     // 打api
     public static function ecpayInvoice($data,$url)
     {
         $factory = new Factory([
-            'hashKey' => env('ECPAY_INVOICE_HASHKEY'),
-            'hashIv' => env('ECPAY_INVOICE_HASHIV'),
+            'hashKey' => InvoiceTrait::$hashKey,
+            'hashIv' => InvoiceTrait::$hashIv,
         ]);
         $postService = $factory->create('PostWithAesJsonResponseService');
 
         $input = [
-            'MerchantID' => env('ECPAY_MERCHANTID'),
+            'MerchantID' => InvoiceTrait::$MerchantID,
             'RqHeader' => [
                 'Timestamp' => time(),
                 'Revision' => '3.0.0',
@@ -30,11 +36,27 @@ trait InvoiceTrait
         return $response;
     }
 
-    // 查詢字軌
-    public function getGovInvoiceWordSetting()
+    // 查詢字軌使用情況
+    public function getInvoiceWordSetting($year,$invoiceTerm)
+    {
+        $data = [
+            "MerchantID" => InvoiceTrait::$MerchantID,
+            "InvoiceTerm" => $invoiceTerm,
+            "InvoiceYear" => $year,
+            "UseStatus" => 4,
+            "InvoiceCategory" => 1,
+        ];
+        $url = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/GetInvoiceWordSetting';
+        
+        $response = InvoiceTrait::ecpayInvoice($data,$url);
+        return $response;
+    }
+
+    // 查詢財政部配號結果
+    public function getGovInvoiceWordSetting($year)
     {        
         $data = [
-            'MerchantID' => env('ECPAY_MERCHANTID'),
+            'MerchantID' => InvoiceTrait::$MerchantID,
             'InvoiceYear' => '111', //發票年份
         ];
         $url = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/GetGovInvoiceWordSetting';
@@ -44,17 +66,17 @@ trait InvoiceTrait
     }
 
     // 字軌與配號設定
-    public function AddInvoiceWordSetting()
+    public function AddInvoiceWordSetting($invoice)
     {
         $data = [
-            'MerchantID' => env('ECPAY_MERCHANTID'),
-            'InvoiceTerm' => '1',   // 發票期別 0->1月~2月、1->3月~4月 以此類推到12月
-            'InvoiceYear' => '109', //發票年份
+            'MerchantID' => InvoiceTrait::$MerchantID,
+            'InvoiceTerm' => $invoice['InvoiceTerm'],   // 發票期別 1->1月~2月、2->3月~4月 以此類推到12月
+            'InvoiceYear' => $invoice['InvoiceYear'], //發票年份
             'InvType' => '07',  //字軌類別
             'InvoiceCategory' => '1',   //發票種類 固定寫1
-            'InvoiceHeader' => 'TW',    //發票字軌 
-            'InvoiceStart' => '10000000',   //起始發票編號
-            'InvoiceEnd' => '10000049', //結束發票編號
+            'InvoiceHeader' => $invoice['InvoiceHeader'],    //發票字軌 
+            'InvoiceStart' => $invoice['InvoiceStart'],   //起始發票編號
+            'InvoiceEnd' => $invoice['InvoiceEnd'], //結束發票編號
         ];
         $url = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/AddInvoiceWordSetting';
         
@@ -63,14 +85,14 @@ trait InvoiceTrait
     }
 
     // 設定字軌號碼狀態
-    public function updateInvoiceWordStatus()
+    public function updateInvoiceWordStatus($trackId,$invoiceStatus)
     {
         $data = [
-            'MerchantID' => env('ECPAY_MERCHANTID'),
-            'TrackID' => '1234567890',  // 字軌號碼 ID S
-            'InvoiceStatus' => '2', //發票字軌狀態 0->停用、1->暫停、2->啟用
+            'MerchantID' => InvoiceTrait::$MerchantID,
+            'TrackID' => $trackId,  // 字軌號碼 ID S
+            'InvoiceStatus' => $invoiceStatus, //發票字軌狀態 0->停用、1->暫停、2->啟用
         ];
-        $url = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/AddInvoiceWordSetting';
+        $url = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/UpdateInvoiceWordStatus';
         
         $response = InvoiceTrait::ecpayInvoice($data,$url);
         return $response;
@@ -80,7 +102,7 @@ trait InvoiceTrait
     public function Issue()
     {
         $data = [
-            "MerchantID" => env('ECPAY_MERCHANTID'),
+            "MerchantID" => InvoiceTrait::$MerchantID,
             "RelateNumber" => "20181028000000001",
             "CustomerID" => "",
             "CustomerIdentifier" => "",
@@ -122,7 +144,7 @@ trait InvoiceTrait
     public function GetIssue()
     {
         $data = [
-            "MerchantID" => env('ECPAY_MERCHANTID'),
+            "MerchantID" => InvoiceTrait::$MerchantID,
             "InvoiceNo" => "AA123456",
             "InvoiceDate" => "2018-10-28",
         ];
@@ -130,7 +152,5 @@ trait InvoiceTrait
         
         $response = InvoiceTrait::ecpayInvoice($data,$url);
         return $response;
-    }
-
-    
+    }  
 }
