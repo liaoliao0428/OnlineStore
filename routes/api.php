@@ -90,10 +90,17 @@ Route::prefix('productImage')->group(function () {
 /***************************************invoice************************************* */
 // 發票 invoice
 Route::prefix('invoice')->group(function () {
-    // 查詢字軌
-    Route::any('/invoiceWordSetting', [InvoiceController::class, 'invoiceWordSetting'])->name('invoiceWordSetting');
+    // 查詢字軌使用情況
+    Route::any('/', [InvoiceController::class, 'invoice'])->name('invoice');
+    // 查詢財政部配號結果
+    Route::any('/getinvoiceWordSetting', [InvoiceController::class, 'getinvoiceWordSetting'])->name('getinvoiceWordSetting');
     // 字軌與配號設定
     Route::any('/addInvoice', [InvoiceController::class, 'addInvoice'])->name('addInvoice');
+    // 設定字軌號碼狀態
+    Route::any('/updateInvoicStatus', [InvoiceController::class, 'updateInvoicStatus'])->name('updateInvoicStatus');
+
+    //excel讀檔案
+    Route::post('/import_invoice_excel_csv', [InvoiceController::class, 'import_invoice_excel_csv'])->name('import_invoice_excel_csv');
 });
 /***************************************invoice************************************* */
 
