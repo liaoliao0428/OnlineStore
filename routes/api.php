@@ -98,7 +98,6 @@ Route::prefix('invoice')->group(function () {
     Route::any('/addInvoice', [InvoiceController::class, 'addInvoice'])->name('addInvoice');
     // 設定字軌號碼狀態
     Route::any('/updateInvoicStatus', [InvoiceController::class, 'updateInvoicStatus'])->name('updateInvoicStatus');
-
     //excel讀檔案
     Route::post('/import_invoice_excel_csv', [InvoiceController::class, 'import_invoice_excel_csv'])->name('import_invoice_excel_csv');
 });
