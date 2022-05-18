@@ -43,7 +43,7 @@ trait InvoiceTrait
             "MerchantID" => InvoiceTrait::$MerchantID,
             "InvoiceTerm" => $invoiceTerm,
             "InvoiceYear" => $year,
-            "UseStatus" => 4,
+            "UseStatus" => 0,
             "InvoiceCategory" => 1,
         ];
         $url = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/GetInvoiceWordSetting';
@@ -57,7 +57,7 @@ trait InvoiceTrait
     {        
         $data = [
             'MerchantID' => InvoiceTrait::$MerchantID,
-            'InvoiceYear' => '111', //發票年份
+            'InvoiceYear' => $year, //發票年份
         ];
         $url = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/GetGovInvoiceWordSetting';
         

@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Storage;
 
 use App\Http\Traits\ToolTrait;
 use App\Http\Traits\Ecpay\InvoiceTrait;
-use Ecpay\Sdk\Factories\Factory;
 
 
 class InvoiceController extends Controller
@@ -39,12 +38,13 @@ class InvoiceController extends Controller
         return response()->json(['invoice' => $invoice], Response::HTTP_OK);
     }
 
-    // 查詢財政部配號結果
+    // 查詢財政部配號結果 取下一期的資料
     public function getinvoiceWordSetting(Request $request)
     {
-        $year = $request->year;
+        $year = (string)$request->year;
+
         $invoice = InvoiceTrait::getGovInvoiceWordSetting($year);
-        dd($invoice);        
+        return response()->json(['invoice' => $invoice], Response::HTTP_OK);
     }
 
     // 字軌與配號設定
@@ -57,13 +57,6 @@ class InvoiceController extends Controller
         $invoice['InvoiceEnd'] = $request->invoiceEnd;
 
         $response = InvoiceTrait::AddInvoiceWordSetting($invoice);
-
-        // 字軌與配號設定成功後將狀態改成啟用
-        if($response['Data']['RtnCode'] == 1){
-            $trackId = $response['Data']['TrackID'];
-            $this->updateInvoicStatus($trackId);
-        }
-
         return response()->json(['response' => $response], Response::HTTP_OK);
     }
 
@@ -72,8 +65,10 @@ class InvoiceController extends Controller
     {
         $trackId = $request->trackId;
         $invoiceStatus = (int)$request->invoiceStatus;
+
         $response = InvoiceTrait::updateInvoiceWordStatus($trackId,$invoiceStatus);
-        return $response;
+        return response()->json(['response' => $response], Response::HTTP_OK);
+
     }
 
     /*********************invoice_excel上傳並匯入******************** */

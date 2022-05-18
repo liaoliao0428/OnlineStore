@@ -26,8 +26,8 @@
             <input id="date" type="month" onchange="invoiceHtmlInsert()">
         </div>
         <div class="col-9 d-flex justify-content-end">
-            <div class="col-2 me-2">
-                <button id="button_6" class="btn btn-outline-success" style="width: 100%;">綠界自動新增發票</button>
+            <div class="col-3 me-2">
+                <button class="btn btn-outline-success" style="width: 100%;" onclick="autoGetEcpayInvoice()">綠界自動新增下個月發票</button>
             </div>
             <div class="col-2">
                 <button id="button_6" class="btn btn-outline-success" style="width: 100%;" data-bs-toggle="modal" data-bs-target="#invoiceModal">手動新增發票</button>
@@ -199,6 +199,54 @@
     })
 /**************************************發票讀取csv檔案************************************ */
 
+/**************************************手動新增發票送出************************************ */
+const submitInvoice = async () => {
+        // 字軌格式判斷
+        let invoiceHeader =  $("input#invoiceHeader").val()
+        let regExp = /[a-z A-Z]/;
+        if(!invoiceHeader || invoiceHeader.length !==2 || !regExp.test(invoiceHeader)){
+            alert('字軌格式錯誤')
+            return null;
+        }
+        invoiceHeader = invoiceHeader.toUpperCase()
+
+        // 發票起始號碼判斷
+        let invoiceStart = $("input#invoiceStart").val()
+        if(!invoiceStart || invoiceStart.trim().length !== 8){
+            alert('發票起始號碼錯誤')
+            return null;
+        }
+
+        //發票結束號碼判斷
+        let invoiceEnd  = $("input#invoiceEnd").val()
+        if(!invoiceEnd || invoiceEnd.trim().length !== 8){
+            alert('發票結束號碼錯誤')
+            return null;
+        }
+        
+        $('#loading').css({
+            'display': 'block'
+        });
+        $('#invoiceModal button').attr("disabled", true);
+
+        let invoiceYear = $("select#invoiceYear").val() - 1911
+        let invoiceTerm = $("select#invoiceTerm").val()
+
+        let response = await axios.post("{{route('addInvoice')}}",{
+            'invoiceYear': invoiceYear,
+            'invoiceTerm': invoiceTerm,
+            'invoiceHeader': invoiceHeader,
+            'invoiceStart': invoiceStart,
+            'invoiceEnd': invoiceEnd,
+        })
+
+        if(response.data.response.Data.RtnCode != 1){
+            alert(response.data.response.Data.RtnMsg)
+        }
+        window.location.reload()       
+    }
+/**************************************手動新增發票送出************************************ */
+
 /**************************************抓發票資料************************************ */
     // 查詢目前已登入發票
     const getInvoiceData = async () => {
@@ -261,8 +309,34 @@
                 let month = invoiceMonth(invoiceTerm)
 
                 // 發票使用狀態判斷
-                let UseStatus = invoice.UseStatus
-                let status = invoiceStatus(UseStatus)                           
+                let UseStatus = invoice.UseStatus   //1->未啟用，2->使用中，3->已停用，4->暫停中，5->待審核，6->審核不通過
+
+                let status = invoiceStatus(UseStatus)              
+                
+                // 發票更改使用狀態html
+                let invoiceStatusHtml = `--`
+                switch(UseStatus){
+                    case 1: //未啟用
+                        invoiceStatusHtml = `<select name="invoiceStatus${TrackID}" id="invoiceStatus${TrackID}" class="form-select" onchange="updateInvoicStatus('${TrackID}')">
+                                                <option value="">請選擇</option>
+                                                <option value="2">啟用</option>
+                                            </select>`
+                    break
+
+                    case 2: //使用中
+                        invoiceStatusHtml = `<select name="invoiceStatus${TrackID}" id="invoiceStatus${TrackID}" class="form-select" onchange="updateInvoicStatus('${TrackID}')">
+                                                <option value="">請選擇</option>
+                                                <option value="1">暫停</option>
+                                            </select>`
+                    break
+
+                    case 4: //暫停中
+                        invoiceStatusHtml = `<select name="invoiceStatus${TrackID}" id="invoiceStatus${TrackID}" class="form-select" onchange="updateInvoicStatus('${TrackID}')">
+                                                <option value="">請選擇</option>
+                                                <option value="2">啟用</option>
+                                            </select>`
+                    break
+                }
 
                 html += `<tr>
                             <th scope="row">${invoice.InvoiceYear}</th>
@@ -275,10 +349,7 @@
                             <td>${invoice.InvoiceNo}</td>
                             <td>${status}</td>
                             <td>
-                                <select name="invoiceStatus${TrackID}" id="invoiceStatus${TrackID}" class="form-select" onchange="updateInvoicStatus('${TrackID}')">
-                                    <option value="1">暫停</option>
-                                    <option value="2">啟用</option>
-                                </select>
+                                ${invoiceStatusHtml}
                             </td>
                         </tr>`
             })
@@ -357,65 +428,100 @@
     invoiceHtmlInsert()
 /**************************************抓發票資料************************************ */
 
-/**************************************發票送出************************************ */
-    const submitInvoice = async () => {
-        // 字軌格式判斷
-        let invoiceHeader =  $("input#invoiceHeader").val()
-        let regExp = /[a-z A-Z]/;
-        if(!invoiceHeader || invoiceHeader.length !==2 || !regExp.test(invoiceHeader)){
-            alert('字軌格式錯誤')
-            return null;
-        }
-        invoiceHeader = invoiceHeader.toUpperCase()
-
-        // 發票起始號碼判斷
-        let invoiceStart = $("input#invoiceStart").val()
-        if(!invoiceStart || invoiceStart.trim().length !== 8){
-            alert('發票起始號碼錯誤')
-            return null;
-        }
-
-        //發票結束號碼判斷
-        let invoiceEnd  = $("input#invoiceEnd").val()
-        if(!invoiceEnd || invoiceEnd.trim().length !== 8){
-            alert('發票結束號碼錯誤')
-            return null;
-        }
-        
-        $('#loading').css({
-            'display': 'block'
-        });
-        $('#invoiceModal button').attr("disabled", true);
-
-        let invoiceYear = $("select#invoiceYear").val() - 1911
-        let invoiceTerm = $("select#invoiceTerm").val()
-
-        let response = await axios.post("{{route('addInvoice')}}",{
-            'invoiceYear': invoiceYear,
-            'invoiceTerm': invoiceTerm,
-            'invoiceHeader': invoiceHeader,
-            'invoiceStart': invoiceStart,
-            'invoiceEnd': invoiceEnd,
+    // 發票更改狀態
+    const updateInvoicStatus = async (TrackID) => {
+        let invoiceStatus = 'invoiceStatus' + TrackID
+        let status = $(`select#${invoiceStatus}`).val()
+        let response = await axios.post("{{route('updateInvoicStatus')}}",{
+            'trackId': TrackID,
+            'invoiceStatus': status
         })
 
         if(response.data.response.Data.RtnCode != 1){
             alert(response.data.response.Data.RtnMsg)
-        }
-        window.location.reload()       
+        }    
+        invoiceHtmlInsert()
     }
-/**************************************發票送出************************************ */
 
-// 發票更改狀態
-const updateInvoicStatus = async (TrackID) => {
-    let invoiceStatus = 'invoiceStatus' + TrackID
-    let status = $(`select#${invoiceStatus}`).val()
-    let response = await axios.post("{{route('updateInvoicStatus')}}",{
-        'trackId': TrackID,
-        'invoiceStatus': status
-    })
-    console.log(response);
-    invoiceHtmlInsert()
-}
+/**************************************綠界自動新增發票************************************ */
+    // 綠界自動新增發票
+    const autoGetEcpayInvoice = async () => {
+        let nowDate = new Date()
+        let year = (nowDate.getFullYear()) - 1911
+        let month = new Date().getMonth() + 1
+
+        let invoiceTerm = 0
+        switch (month) {
+            case 1:
+            case 2:
+                invoiceTerm = 1
+            break;
+
+            case 3:
+            case 4:
+                invoiceTerm = 2
+            break;
+
+            case 5:
+            case 6:
+                invoiceTerm = 3
+            break;
+
+            case 7:
+            case 8:
+                invoiceTerm = 4
+            break;
+
+            case 9:
+            case 10:
+                invoiceTerm = 5
+            break;
+
+            case 11:
+            case 12:
+                invoiceTerm = 6
+            break;
+        }
+        
+        // 如果是11月或12月 那就要取明年第一期的資料 所以年分+1 invoiceTerm = 1
+        if(month == 11 || month == 12){
+            year += 1
+            invoiceTerm = 1
+        }else{
+            invoiceTerm += 1
+        }
+
+        let newInvoice = await axios.post("{{route('getinvoiceWordSetting')}}",{
+            'year': year
+        })
+
+        // 如果RtnCode != 1 代表新增失敗 回傳綠界錯誤訊息
+        if(newInvoice.data.invoice.Data.RtnCode != 1){
+            alert(newInvoice.data.invoice.Data.RtnMsg)
+        }else{
+            let invoiceInfo = newInvoice.data.invoice.Data.InvoiceInfo
+            let index = invoiceInfo.findIndex( (element) => element.InvoiceTerm == invoiceTerm)
+            let nextTermInvoice = invoiceInfo[index];
+
+            let response = await axios.post("{{route('addInvoice')}}",{
+                'invoiceYear': year,
+                'invoiceTerm': nextTermInvoice.InvoiceTerm,
+                'invoiceHeader': nextTermInvoice.InvoiceHeader,
+                'invoiceStart': nextTermInvoice.InvoiceStart,
+                'invoiceEnd': nextTermInvoice.InvoiceEnd,
+            })
+
+            // 如果RtnCode != 1 代表新增失敗 回傳綠界錯誤訊息
+            if(response.data.response.Data.RtnCode != 1){
+                alert(response.data.response.Data.RtnMsg);
+            }else{
+                invoiceHtmlInsert()
+            }        
+        }
+    }
+/**************************************綠界自動新增發票************************************ */
+
+
 
 
 </script>
