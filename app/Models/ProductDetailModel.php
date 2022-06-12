@@ -40,13 +40,37 @@ class ProductDetailModel
     // 抓商品細項資料
     public static function select_product_detail_with_productId_db($productId)
     {
-        return DB::select("SELECT * FROM product_detail WHERE productId = '$productId' ORDER BY sort ASC");
+        return DB::select("SELECT * 
+                           FROM product_detail 
+                           WHERE productId = '$productId' 
+                           ORDER BY sort ASC");
+    }
+
+    // 抓商品細項資料篩選掉沒上架的
+    public static function select_product_detail_with_productId_enable_db($productId)
+    {
+        return DB::select("SELECT * 
+                           FROM product_detail 
+                           WHERE productId = '$productId' AND enable = 1 
+                           ORDER BY sort ASC");
     }
 
     // 抓指定商品細項資料
-    public static function  select_product_detail_with_productDetailId_db($productDetailId)
+    public static function select_product_detail_with_productDetailId_db($productDetailId)
     {
-        return DB::select("SELECT * FROM product_detail WHERE productDetailId = '$productDetailId'");
+        return DB::select("SELECT * 
+                           FROM product_detail 
+                           WHERE productDetailId = '$productDetailId'");
+    }
+
+    // 抓指定商品細項價錢(最便宜的)
+    public static function select_product_detail_price_with_productId_db($productId)
+    {
+        return DB::select("SELECT unitPrice 
+                           FROM product_detail 
+                           WHERE productId = '$productId' AND enable = 1 AND quantity > 0 
+                           ORDER BY unitPrice ASC 
+                           LIMIT 1 ");
     }
 
     // 商品子項寫入

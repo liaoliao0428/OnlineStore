@@ -137,7 +137,7 @@
     const getProductIdFromUrl = async () => {
         let url = location.pathname
         let splitUrl = url.split("/");
-        let productId = splitUrl[5]
+        let productId = splitUrl[6]
         return productId
     }
 
@@ -361,7 +361,7 @@
                 let host = productImages.host
                 let imageCount = productImages.imageCount
 
-                td[i] = `<img src="${host}/OnlineStore/storage/app/public/productImage/${productId}/${image}" height="140">
+                td[i] = `<img src="${host}/OnlineStore/Backend/storage/app/public/productImage/${productId}/${image}" height="140">
                          <div class="d-flex justify-content-center">
                              <button class="btn btn-outline-secondary mt-2 mx-auto col-3" onclick="changeProductImageSort('${productId}','${imageId}','${sort-1}','${sort}','${imageCount}')"><i class='bx bx-caret-up-circle mx-0'></i></button>
                              <button class="btn btn-outline-secondary mt-2 mx-auto col-3" onclick="changeProductImageSort('${productId}','${imageId}','${sort+1}','${sort}','${imageCount}')"><i class='bx bx-caret-down-circle mx-0'></i></button>

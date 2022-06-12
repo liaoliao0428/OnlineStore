@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Invoice;
+namespace App\Http\Controllers\Backend\Invoice;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
