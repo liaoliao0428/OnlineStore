@@ -52,7 +52,7 @@ class ProductDetailModel
         return DB::select("SELECT * 
                            FROM product_detail 
                            WHERE productId = '$productId' AND enable = 1 
-                           ORDER BY sort ASC");
+                           ORDER BY unitPrice ASC");
     }
 
     // 抓指定商品細項資料
