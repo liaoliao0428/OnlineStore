@@ -22,6 +22,9 @@ use App\Http\Controllers\Frontend\Product\ProductApi;
 
 use App\Http\Controllers\Frontend\Category\CategoryApi;
 
+use App\Http\Controllers\Frontend\User\UserApi;
+
+
 /************************************ frontStage API Contorller************************************ */
 
 
@@ -114,6 +117,15 @@ Route::prefix('invoice')->group(function () {
 
 
 Route::prefix('frontend')->group(function () {
+    // User
+    Route::prefix('user')->group(function () {
+        // 寄驗證碼信件
+        Route::post('/sendVerifyMail', [UserApi::class, 'sendVerifyMail'])->name('userSendVerifyMail');
+        // 註冊
+        Route::post('/signup', [UserApi::class, 'signup'])->name('userSignup');
+    });
+
+
     // Category
     Route::prefix('category')->group(function () {
         // 查詢字軌使用情況
