@@ -6,90 +6,101 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Session;
+
+use App\Models\UserModel;
+use App\Models\UserMailVerifyModel;
+
+use App\Http\Controllers\Frontend\User\UserMailVerifyApi;
+
+use App\Http\Traits\ToolTrait;
+
 
 class UserApi extends Controller
-{
-    protected $mail;
-
-    // 寄驗證碼信件
-    public function sendVerifyMail(Request $request)
+{   use ToolTrait;
+    //建構子 middleware設定
+    public function __construct()
     {
-        // 信箱存入物件 以便寄信function可以動態改變信箱
-        $mail = $request->mail;
-        $this->mail = $mail;
 
-        // 判斷信箱是否已註冊過
-
-        // 驗證碼
-        $verifyNumber = rand(100000, 999999);
-
-        // 寄信內容
-        $mailContent = "您的驗證碼如下 請在5分鐘內完成輸入 驗證碼 : " . $verifyNumber;
-        // 寄信
-        $this->sendMail($mailContent);
-
-        // 信箱、驗證碼加密
-        $encryptionString = $mail . $verifyNumber;
-        $encryption = md5($encryptionString);
-
-        //剛剛加密的存入session 時間設定五分鐘 
-        $request->session()->put('verifyNumberEncryption', $encryption);
-        // session(['verifyNumberEncryption' => $encryption]);
-        // session::save();
-
-        $verifyNumberEncryption = $request->session()->get('verifyNumberEncryption');
-        return Session::all();
-        return $verifyNumberEncryption;
-    }
-
-    // 寄信
-    public function sendMail($mailContent)
-    {
-        // $mail = '0451008@nkust.edu.tw';
-        Mail::raw($mailContent ,function($message){
-            $mail = $this->mail; // 使用物件寫法將信箱動態帶入
-            $message->to($mail)->subject('xxxxStore註冊驗證信');
-        });
     }
 
     // 註冊
     public function signup(Request $request)
     {
-        $verifyNumberEncryption = $request->session()->get('verifyNumberEncryption');
-        $verifyNumberEncryption =  Session::get('verifyNumberEncryption');
-        return Session::all();
-        return $verifyNumberEncryption;
-
-
-
         $mail = $request->mail;
         $verifyNumber = $request->verifyNumber;
         $userName = $request->userName;
         $password = $request->password;
         
         // 驗證信箱是否正確
-        $verifyString = $mail . $verifyNumber;
-        $mailCheck = $this->mailCheck($verifyString);
+        $mailCheck = $this->mailCheck($mail , $verifyNumber);
         if(!$mailCheck){
-            return response()->json(['mailCheck' => '信箱錯誤'], Response::HTTP_OK);
+            return response()->json(['mailCheck' => '驗證碼錯誤'], Response::HTTP_OK);
         }
 
+        // 使用password_hash密碼加密
+        $encryptionPassword = password_hash($password, PASSWORD_DEFAULT);
 
+        // 如果驗證正確將註冊訊息寫入資料庫
+        $user['userId'] = $this->randomString(13);
+        $user['userName'] = $userName;
+        $user['mail'] = $mail;
+        $user['password'] = $encryptionPassword;
+        $accessToken = $this->randomString(23);
+        $user['accessToken'] = $accessToken;
+        $user['lastLoginTime'] = date('Y-m-d H:i:s');
+        UserModel::insert_user_db($user);
+        // 刪除已驗證完成信箱資訊
+        $this->deleteVerifyedMail($mail);
 
-
+        return response()->json(['accessToken' => $accessToken], Response::HTTP_OK);
     }
 
     // 驗證信箱是否正確
-    public function mailCheck($verifyString)
+    public function mailCheck($mail , $verifyNumber)
     {
-        $verifyNumberEncryption = Session::get('verifyNumberEncryption');
+        $verifyString = $mail . $verifyNumber;
         $verifyNumberCheck = md5($verifyString);
-        if($verifyNumberCheck === $verifyNumberEncryption){
+        $nowTime = date("Y-m-d H:i:s");
+
+        // 抓指定信箱驗證加密
+        $verifyNumberEncryption = UserMailVerifyModel::select_user_mail_verify_where_mail_db($mail);
+        if(!$verifyNumberEncryption){
+            return false;
+        }
+
+        // 加密驗證碼
+        $verifyEncryption = $verifyNumberEncryption[0]->verifyNumberEncryption;
+        // 過期時間
+        $experTime = $verifyNumberEncryption[0]->experTime;
+
+        //  驗證碼相同 而且沒有超過驗證時間 回傳true
+        if($verifyNumberCheck === $verifyEncryption && $nowTime <= $experTime){
             return true;
         }else{
             return false;
+        }
+    }
+
+    // 刪除已驗證完成信箱資訊
+    public function deleteVerifyedMail($mail)
+    {
+        $UserMailVerifyApi = new UserMailVerifyApi();
+        $UserMailVerifyApi->deleteVerifyedMail($mail);
+    }
+
+    //  取得使用者頭像及使用者名稱
+    public function getUserBasicData(Request $request)
+    {
+        $mail = $request->mail;
+
+        // 抓資料
+        $userBasicData = UserModel::select_user_userName_userImage_db($mail);
+
+        // 回傳
+        if($userBasicData){
+            return response()->json(['userBasicData' => $userBasicData[0]], Response::HTTP_OK);
+        }else{
+            return response()->json(['userBasicData' => null], Response::HTTP_OK);
         }
     }
 }
