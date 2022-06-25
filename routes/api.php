@@ -24,6 +24,7 @@ use App\Http\Controllers\Frontend\Category\CategoryApi;
 
 use App\Http\Controllers\Frontend\User\UserApi;
 
+use App\Http\Controllers\Frontend\User\UserMailVerifyApi;
 
 /************************************ frontStage API Contorller************************************ */
 
@@ -119,25 +120,31 @@ Route::prefix('invoice')->group(function () {
 Route::prefix('frontend')->group(function () {
     // User
     Route::prefix('user')->group(function () {
-        // 寄驗證碼信件
-        Route::post('/sendVerifyMail', [UserApi::class, 'sendVerifyMail'])->name('userSendVerifyMail');
         // 註冊
-        Route::post('/signup', [UserApi::class, 'signup'])->name('userSignup');
+        Route::post('/signup', [UserApi::class, 'signup']);
+        //  取得使用者頭像及使用者名稱
+        Route::post('/getUserBasicData', [UserApi::class, 'getUserBasicData']);
+    });
+
+    // UserMailVerify
+    Route::prefix('UserMailVerify')->group(function () {
+        // 寄驗證碼信件
+        Route::post('/sendVerifyMail', [UserMailVerifyApi::class, 'sendVerifyMail']);
     });
 
 
     // Category
     Route::prefix('category')->group(function () {
         // 查詢字軌使用情況
-        Route::post('/all', [CategoryApi::class, 'categoryAll'])->name('frontendCategoryAll');
+        Route::post('/all', [CategoryApi::class, 'categoryAll']);
     });
 
     // Product
     Route::prefix('product')->group(function () {
         // 搜尋商品
-        Route::post('/all', [ProductApi::class, 'productAll'])->name('frontendProductAll');
+        Route::post('/all', [ProductApi::class, 'productAll']);
         // 商品細項
-        Route::post('/detail', [ProductApi::class, 'productDetail'])->name('frontendProductDetail');
+        Route::post('/detail', [ProductApi::class, 'productDetail']);
     });
     
 });

@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
-class UserModel extends Model
+class User extends Model
 {
     //指定資料表
     protected $table = 'user';
@@ -22,12 +23,15 @@ class UserModel extends Model
     protected $fillable = [
         'userId',
         'userName',
+        'userImage',
         'gender',
         'phone',
         'address',
         'mail',
         'birthDay',
-        'lastLoginTime'
+        'lastLoginTime',
+        'password',
+        'accessToken',
     ];
 
     /**
@@ -36,7 +40,27 @@ class UserModel extends Model
      * @var array<int, string>
      */
     protected $hidden = [
-        'password',
-        'accessToken',
+        
     ];
+}
+
+class UserModel
+{
+    // 註冊訊息寫入資料庫
+    public static function insert_user_db($user)
+    {
+        User::create($user);
+    }
+
+    // 抓資料庫這個信箱有沒有資料
+    public static function select_user_where_mail($mail)
+    {
+        return DB::select("SELECT * FROM user WHERE mail = '$mail'");
+    }
+
+    // 抓使用者頭像以及使用者名稱
+    public static function select_user_userName_userImage_db($mail)
+    {
+        return DB::select("SELECT userName , userImage FROM user WHERE mail = '$mail'");
+    }
 }
