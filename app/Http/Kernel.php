@@ -22,7 +22,6 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class
-
     ];
 
     /**
@@ -69,5 +68,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'cros' => \App\Http\Middleware\EnableCrossRequestMiddleware::class,
         'authCheck' => \App\Http\Middleware\AuthCheck::class,  //帳戶驗證middleware
+        'frontAuthCheck' => \App\Http\Middleware\FrontAuthCheck::class,  //前台帳戶驗證middleware
     ];
 }

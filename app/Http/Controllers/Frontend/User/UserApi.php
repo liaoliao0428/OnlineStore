@@ -21,7 +21,7 @@ class UserApi extends Controller
     //建構子 middleware設定
     public function __construct()
     {
-
+        $this->middleware('frontAuthCheck')->except('signin','signup','mailCheck','deleteVerifyedMail');
     }
 
     // 註冊
@@ -115,18 +115,7 @@ class UserApi extends Controller
     //  取得使用者頭像及使用者名稱
     public function getUserBasicData(Request $request)
     {
-        $accessToken = $request->accessToken;
-
-        // token解析 轉入middleware
-        $tokenCheck = JwtTrait::jwtDecode($accessToken);
-        
-        if($tokenCheck){
-            $userId =  $tokenCheck['uid'];
-        }else{
-            return false;
-        }
-        // token解析 轉入middleware
-
+        $userId = $request->userId;
 
         // 抓資料
         $userBasicData = UserModel::select_user_userName_userImage_db($userId);
@@ -138,86 +127,4 @@ class UserApi extends Controller
             return response()->json(['userBasicData' => null], Response::HTTP_OK);
         }
     }
-
-    // jwt 改到trait
-
-    // // jwtEncode
-    // public function jwtEncode($uid)
-    // {       
-    //     $header = [
-    //         'typ'=> 'JWT',
-    //         'alg'=> 'HS256',
-    //     ];
-
-    //     // token核發時間
-    //     $iat = time();
-    //     // token過期時間 預設3小時(變成秒數) 3 * 60 * 60
-    //     $exp = time() + 10800;
-
-    //     $payload = [
-    //         'uid' => $uid,
-    //         'iat' => $iat,
-    //         'exp' => $exp
-    //     ];
-
-    //     $header_payload = base64_encode(json_encode($header)) . "." . base64_encode(json_encode($payload));
-
-    //     $secretKey = env('JWT_SECRET_KEY');
-    //     $signature = hash_hmac('sha256', $header_payload, $secretKey);
-
-    //     $accesstoken = $header_payload . "." . base64_encode($signature);
-
-    //     return $accesstoken;
-    // }
-
-    // // jwtDecode
-    // public function jwtDecode($accessToken)
-    // {
-    //     // 將accessToken分解 如果不是三個部分 false
-    //     $tokens = explode('.', $accessToken);
-    //     if (count($tokens) != 3){
-    //         return false;
-    //     }
-
-    //     // 用list將要解析的三個部分拆分
-    //     list($base64header, $base64payload, $signature) = $tokens;       
-
-    //     // 取得jwt算法 如果沒有alg false
-    //     $base64decodeheader = json_decode(base64_decode($base64header),true);
-    //     if (empty($base64decodeheader['alg'])){
-    //         return false;
-    //     }
- 
-    //     // $signature 簽章驗證
-    //     $header_payload = $base64header . '.' . $base64payload;
-    //     if ($this->signatureCheck($base64decodeheader['alg'] , $header_payload) !== $signature){
-    //         return false;
-    //     }         
-
-    //     $payload = json_decode(base64_decode($base64payload), true);
-
-    //     // 簽證核發時間大於當前時間 代表簽證是錯的 false
-    //     if(isset($payload['exp']) && $payload['iat'] > time()){
-    //         return false;
-    //     }
-
-    //     // 簽證過期時間小於當前時間 代表簽證已過期 false
-    //     if(isset($payload['exp']) && $payload['exp'] < time()){
-    //         return false;
-    //     }
-
-    //     return $payload;
-    // }
-
-    // // 簽章驗證
-    // public function signatureCheck($alg , $header_payload)
-    // {
-    //     $secretKey = env('JWT_SECRET_KEY');
-
-    //     $alg_config = [
-    //         'HS256'=>'sha256'
-    //     ];            
-
-    //     return base64_encode(hash_hmac($alg_config[$alg] , $header_payload , $secretKey));
-    // }
 }
