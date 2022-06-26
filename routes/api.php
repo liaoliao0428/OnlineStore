@@ -122,6 +122,8 @@ Route::prefix('frontend')->group(function () {
     Route::prefix('user')->group(function () {
         // 註冊
         Route::post('/signup', [UserApi::class, 'signup']);
+        // 登入
+        Route::post('/signin', [UserApi::class, 'signin']);
         //  取得使用者頭像及使用者名稱
         Route::post('/getUserBasicData', [UserApi::class, 'getUserBasicData']);
     });
