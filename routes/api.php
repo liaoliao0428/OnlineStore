@@ -120,12 +120,18 @@ Route::prefix('invoice')->group(function () {
 Route::prefix('frontend')->group(function () {
     // User
     Route::prefix('user')->group(function () {
+        // react route 權限驗證
+        Route::post('/reactRouteAuthCheck', [UserApi::class, 'reactRouteAuthCheck']);
         // 註冊
         Route::post('/signup', [UserApi::class, 'signup']);
         // 登入
         Route::post('/signin', [UserApi::class, 'signin']);
-        //  取得使用者頭像及使用者名稱
+        // 取得使用者頭像及使用者名稱
         Route::post('/getUserBasicData', [UserApi::class, 'getUserBasicData']);
+        // 取得使用者基本資訊
+        Route::post('/getUserData', [UserApi::class, 'getUserData']);
+        // 更新使用者資料
+        Route::patch('/updateUserData', [UserApi::class, 'updateUserData']);
     });
 
     // UserMailVerify

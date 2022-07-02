@@ -52,7 +52,13 @@ class UserModel
         User::create($user);
     }
 
-    // 更新資料
+    // 更新會員資料
+    public static function update_user_db($userId , $userData)
+    {
+        User::where('userId',$userId)->update($userData);
+    }
+
+    // 更新上次登入時間
     public static function update_user_lastLoginTime_db($userId , $signinTime)
     {
         User::where('userId',$userId)->update(['lastLoginTime' => $signinTime]);
@@ -74,5 +80,11 @@ class UserModel
     public static function select_user_userName_userImage_db($userId)
     {
         return DB::select("SELECT userName , userImage FROM user WHERE userId = '$userId'");
+    }
+
+    // 抓會員全部資料
+    public static function  select_user_where_userId_db($userId)
+    {
+        return DB::select("SELECT * FROM user WHERE userId = '$userId'");
     }
 }
