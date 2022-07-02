@@ -12,16 +12,32 @@ use App\Models\UserMailVerifyModel;
 
 use App\Http\Controllers\Frontend\User\UserMailVerifyApi;
 
-use App\Http\Traits\ToolTrait;
 use App\Http\Traits\JwtTrait;
 
 
 class UserApi extends Controller
-{   use ToolTrait;
+{   
     //建構子 middleware設定
     public function __construct()
     {
         $this->middleware('frontAuthCheck')->except('signin','signup','mailCheck','deleteVerifyedMail');
+    }
+
+    // react route 權限驗證
+    public function reactRouteAuthCheck(Request $request)
+    {
+        return response()->json([false]);
+
+        // $accessToken = $request->accessToken;
+
+        // // token解析 
+        // $tokenCheck = JwtTrait::jwtDecode($accessToken);
+
+        // if($tokenCheck){
+        //     return response()->json([true]);
+        // }else{
+        //     return response()->json([false]);
+        // }
     }
 
     // 註冊
@@ -126,5 +142,31 @@ class UserApi extends Controller
         }else{
             return response()->json(['userBasicData' => null], Response::HTTP_OK);
         }
+    }
+
+    // 取得使用者基本資訊
+    public function getUserData(Request $request)
+    {
+        // return $request;
+        $userId = $request->userId;
+
+        // 抓資料
+        $userData = UserModel::select_user_where_userId_db($userId);
+        if($userData){
+            return response()->json(['userData' => $userData[0]], Response::HTTP_OK);
+        }else{
+            return response()->json(['userData' => null], Response::HTTP_OK);
+        }
+    }
+
+    // 更新使用者資料
+    public function updateUserData(Request $request)
+    {
+        $userId = $request->userId;
+        $userData = $request->userData;
+
+        UserModel::update_user_db($userId , $userData);
+
+        return response()->json([true], Response::HTTP_OK);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+// use Illuminate\Http\Response;
 use App\Http\Traits\JwtTrait;
 
 class FrontAuthCheck
@@ -18,6 +19,7 @@ class FrontAuthCheck
     public function handle(Request $request, Closure $next)
     {
         $accessToken = $request->accessToken;
+
         // token解析 
         $tokenCheck = JwtTrait::jwtDecode($accessToken);
         // 如果tokenCheck驗證成功 取出uid 並前往下一步
@@ -26,7 +28,7 @@ class FrontAuthCheck
             $request->userId = $userId;
             return $next($request);
         }else{
-            return false;
+            return response()->json([false]);
         }
     }
 }
