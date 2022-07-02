@@ -6,16 +6,29 @@ use Illuminate\Support\Facades\Route;
 /************************************ backStage API Contorller************************************ */
 use App\Http\Controllers\Admin\AdminController;
 
-use App\Http\Controllers\Category\CategoryController;
+use App\Http\Controllers\Backend\Category\CategoryController;
 
-use App\Http\Controllers\Product\ProductController;
-use App\Http\Controllers\Product\ProductDetailController;
-use App\Http\Controllers\Product\ProductImageController;
+use App\Http\Controllers\Backend\Product\ProductController;
+use App\Http\Controllers\Backend\Product\ProductDetailController;
+use App\Http\Controllers\Backend\Product\ProductImageController;
 
-use App\Http\Controllers\Order\OrderController;
+use App\Http\Controllers\Backend\Order\OrderController;
 
-use App\Http\Controllers\Invoice\InvoiceController;
+use App\Http\Controllers\Backend\Invoice\InvoiceController;
 /************************************ backStage API Contorller************************************ */
+
+/************************************ frontStage API Contorller************************************ */
+use App\Http\Controllers\Frontend\Product\ProductApi;
+
+use App\Http\Controllers\Frontend\Category\CategoryApi;
+
+use App\Http\Controllers\Frontend\User\UserApi;
+
+use App\Http\Controllers\Frontend\User\UserMailVerifyApi;
+
+/************************************ frontStage API Contorller************************************ */
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -36,7 +49,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // 分類 category
 Route::prefix('category')->group(function () {
     //產生作廢發票0501_xml
-    Route::post('/all', [App\Http\Controllers\Category\CategoryController::class, 'categoryAll'])->name('categoryAll');
+    Route::post('/all', [CategoryController::class, 'categoryAll'])->name('categoryAll');
 });
 /***************************************category************************************* */
 
@@ -103,6 +116,46 @@ Route::prefix('invoice')->group(function () {
 });
 /***************************************invoice************************************* */
 
+
+Route::prefix('frontend')->group(function () {
+    // User
+    Route::prefix('user')->group(function () {
+        // react route 權限驗證
+        Route::post('/reactRouteAuthCheck', [UserApi::class, 'reactRouteAuthCheck']);
+        // 註冊
+        Route::post('/signup', [UserApi::class, 'signup']);
+        // 登入
+        Route::post('/signin', [UserApi::class, 'signin']);
+        // 取得使用者頭像及使用者名稱
+        Route::post('/getUserBasicData', [UserApi::class, 'getUserBasicData']);
+        // 取得使用者基本資訊
+        Route::post('/getUserData', [UserApi::class, 'getUserData']);
+        // 更新使用者資料
+        Route::patch('/updateUserData', [UserApi::class, 'updateUserData']);
+    });
+
+    // UserMailVerify
+    Route::prefix('UserMailVerify')->group(function () {
+        // 寄驗證碼信件
+        Route::post('/sendVerifyMail', [UserMailVerifyApi::class, 'sendVerifyMail']);
+    });
+
+
+    // Category
+    Route::prefix('category')->group(function () {
+        // 查詢字軌使用情況
+        Route::post('/all', [CategoryApi::class, 'categoryAll']);
+    });
+
+    // Product
+    Route::prefix('product')->group(function () {
+        // 搜尋商品
+        Route::post('/all', [ProductApi::class, 'productAll']);
+        // 商品細項
+        Route::post('/detail', [ProductApi::class, 'productDetail']);
+    });
+    
+});
 
 
 

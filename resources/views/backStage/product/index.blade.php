@@ -61,7 +61,7 @@
     const getCategoryIdFromUrl = async () => {
         let url = location.pathname
         let splitUrl = url.split("/");
-        let categoryId = splitUrl[5]
+        let categoryId = splitUrl[6]
         return categoryId
     } 
 
@@ -192,7 +192,7 @@
             let host = product.host
             let productImage = product.productImage
             let image = ``
-            productImage ? image = `${host}/OnlineStore/storage/app/public/productImage/${productId}/${productImage}` : null
+            productImage ? image = `${host}/OnlineStore/Backend/storage/app/public/productImage/${productId}/${productImage}` : null
 
             // let htmlBody = await productBodyHtml(productDetails)
             let htmlBody = ``

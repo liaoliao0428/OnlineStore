@@ -22,7 +22,6 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class
-
     ];
 
     /**
@@ -39,12 +38,15 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Illuminate\Session\Middleware\StartSession::class, // 這行要寫才會啟動session
         ],
 
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:api',
+            \App\Http\Middleware\EnableCrossRequestMiddleware::class,   // 跨域
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Illuminate\Session\Middleware\StartSession::class, // 這行要寫才會啟動session
         ],
     ];
 
@@ -65,7 +67,8 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'cros' => \App\Http\Middleware\EnableCrossRequestMiddleware::class,
+        // 'cros' => \App\Http\Middleware\EnableCrossRequestMiddleware::class,
         'authCheck' => \App\Http\Middleware\AuthCheck::class,  //帳戶驗證middleware
+        'frontAuthCheck' => \App\Http\Middleware\FrontAuthCheck::class,  //前台帳戶驗證middleware
     ];
 }

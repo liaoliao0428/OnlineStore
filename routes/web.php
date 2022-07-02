@@ -3,16 +3,14 @@
 use Illuminate\Support\Facades\Route;
 
 /************************************ backStage API Contorller************************************ */
-use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Backend\Admin\AdminController;
 
-use App\Http\Controllers\Category\CategoryController;
 
-use App\Http\Controllers\Product\ProductController;
-use App\Http\Controllers\Product\ProductDetailController;
+use App\Http\Controllers\Backend\Product\ProductController;
 
-use App\Http\Controllers\Order\OrderController;
+use App\Http\Controllers\Backend\Order\OrderController;
 
-use App\Http\Controllers\Invoice\InvoiceController;
+use App\Http\Controllers\Backend\Invoice\InvoiceController;
 /************************************ backStage API Contorller************************************ */
 
 /*

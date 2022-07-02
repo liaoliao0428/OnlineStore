@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Product;
+namespace App\Http\Controllers\Backend\Product;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

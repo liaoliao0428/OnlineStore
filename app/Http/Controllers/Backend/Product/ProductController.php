@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Product;
+namespace App\Http\Controllers\Backend\Product;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ToolTrait;
 use App\Http\Traits\SortTrait;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Storage;
 
 use App\Models\ProductModel;
@@ -180,5 +179,7 @@ class ProductController extends Controller
         $this->sortArrange(2,'product','categoryId','sort','productId',$productId,$categoryId,$oldSort);
 
         return response()->json(['message' => "改變排序成功"], Response::HTTP_OK);
-    }  
+    }
+    /*********************************************前台api******************************************* */  
+    // 取得商品
 }
