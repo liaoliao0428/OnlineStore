@@ -26,18 +26,7 @@ class UserApi extends Controller
     // react route 權限驗證
     public function reactRouteAuthCheck(Request $request)
     {
-        return response()->json([false]);
-
-        // $accessToken = $request->accessToken;
-
-        // // token解析 
-        // $tokenCheck = JwtTrait::jwtDecode($accessToken);
-
-        // if($tokenCheck){
-        //     return response()->json([true]);
-        // }else{
-        //     return response()->json([false]);
-        // }
+        return response()->json(['authCheck' => true]);
     }
 
     // 註冊

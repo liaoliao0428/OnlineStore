@@ -18,8 +18,8 @@ class FrontAuthCheck
      */
     public function handle(Request $request, Closure $next)
     {
-        // token解析 
-        $accessToken = $request->accessToken;
+        // token解析         
+        $accessToken = $request->header('authentication');
         $tokenCheck = JwtTrait::jwtDecode($accessToken);
         // 如果tokenCheck驗證成功 取出uid 並前往下一步
         if($tokenCheck){

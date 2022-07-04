@@ -28,6 +28,8 @@ use App\Http\Controllers\Frontend\User\UserMailVerifyApi;
 
 use App\Http\Controllers\Frontend\Cart\CartApi;
 
+use App\Http\Controllers\Frontend\Checkout\CheckoutApi;
+
 /************************************ frontStage API Contorller************************************ */
 
 
@@ -163,7 +165,13 @@ Route::prefix('frontend')->group(function () {
         // 購物車新增商品
         Route::post('/insert', [CartApi::class, 'insert']);
         // 刪除購物車資料
-        Route::delete('/delete', [CartApi::class, 'delete']);
+        Route::post('/delete', [CartApi::class, 'delete']);
+    });
+
+     // Checkout
+     Route::prefix('checkout')->group(function () {
+        // 取得要結帳的資料
+        Route::post('/product', [CheckoutApi::class, 'checkoutProduct']);
     });
     
 });
