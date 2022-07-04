@@ -60,4 +60,14 @@ class CartModel
                            GROUP BY productDetailId 
                            ORDER BY createTime DESC");
     }
+
+    // 撈購物車裡的資料指定userId 跟 productDetailId
+    public static function select_cart_where_userId_productDetailId_db($userId , $productDetailId)
+    {
+        return DB::select("SELECT productDetailId , SUM(quantity) as quantity
+                           FROM cart 
+                           WHERE userId = '$userId' AND productDetailId = '$productDetailId'
+                           GROUP BY productDetailId 
+                           ORDER BY createTime DESC");
+    }
 }

@@ -16,7 +16,7 @@ class CartApi extends Controller
 {
     public function __construct()
     {
-        $this->middleware('frontAuthCheck');
+        $this->middleware('frontAuthCheck')->except('setCartArray');;
     }
 
     // 取得該使用者購物車資料
