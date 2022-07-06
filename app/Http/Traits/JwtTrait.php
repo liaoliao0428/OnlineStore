@@ -53,7 +53,8 @@ trait JwtTrait
  
         // $signature 簽章驗證
         $header_payload = $base64header . '.' . $base64payload;
-        if (JwtTrait::signatureCheck($base64decodeheader['alg'] , $header_payload) !== $signature){
+        $requestSignature = JwtTrait::signatureCheck($base64decodeheader['alg'] , $header_payload);
+        if ($requestSignature !== $signature){
             return false;
         }         
 
@@ -75,7 +76,7 @@ trait JwtTrait
     // 簽章驗證
     public static function signatureCheck($alg , $header_payload)
     {
-        $secretKey = env('JWT_SECRET_KEY');
+        $secretKey = '123456789';   // env有時候取不到  只能放這邊了
 
         $alg_config = [
             'HS256'=>'sha256'

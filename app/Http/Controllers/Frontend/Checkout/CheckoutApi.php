@@ -34,7 +34,8 @@ class CheckoutApi extends Controller
             $productDetailId = $checkoutProduct['productDetailId'];
             $carts = CartModel::select_cart_where_userId_productDetailId_db($userId , $productDetailId);
             // 購物車陣列資料處理 並塞回要結帳的資料中
-            $checkoutProducts = $CartApi->setCartArray($carts);
+            $carts = $CartApi->setCartArray($carts);
+            $checkoutProducts[] = $carts[0];
         }
 
         if(!empty($checkoutProducts)){
