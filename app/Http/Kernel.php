@@ -43,7 +43,7 @@ class Kernel extends HttpKernel
 
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            'throttle:api',
+            'throttle:1000 , 1',
             \App\Http\Middleware\EnableCrossRequestMiddleware::class,   // 跨域
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \Illuminate\Session\Middleware\StartSession::class, // 這行要寫才會啟動session

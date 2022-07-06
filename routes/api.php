@@ -165,7 +165,7 @@ Route::prefix('frontend')->group(function () {
         // 購物車新增商品
         Route::post('/insert', [CartApi::class, 'insert']);
         // 刪除購物車資料
-        Route::post('/delete', [CartApi::class, 'delete']);
+        Route::delete('/delete', [CartApi::class, 'delete']);
     });
 
      // Checkout
