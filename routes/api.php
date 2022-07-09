@@ -26,6 +26,10 @@ use App\Http\Controllers\Frontend\User\UserApi;
 
 use App\Http\Controllers\Frontend\User\UserMailVerifyApi;
 
+use App\Http\Controllers\Frontend\Cart\CartApi;
+
+use App\Http\Controllers\Frontend\Checkout\CheckoutApi;
+
 /************************************ frontStage API Contorller************************************ */
 
 
@@ -140,7 +144,6 @@ Route::prefix('frontend')->group(function () {
         Route::post('/sendVerifyMail', [UserMailVerifyApi::class, 'sendVerifyMail']);
     });
 
-
     // Category
     Route::prefix('category')->group(function () {
         // 查詢字軌使用情況
@@ -153,6 +156,22 @@ Route::prefix('frontend')->group(function () {
         Route::post('/all', [ProductApi::class, 'productAll']);
         // 商品細項
         Route::post('/detail', [ProductApi::class, 'productDetail']);
+    });
+
+    // Cart
+    Route::prefix('cart')->group(function () {
+        // 取得該使用者購物車資料
+        Route::post('/', [CartApi::class, 'cart']);
+        // 購物車新增商品
+        Route::post('/insert', [CartApi::class, 'insert']);
+        // 刪除購物車資料
+        Route::delete('/delete', [CartApi::class, 'delete']);
+    });
+
+     // Checkout
+     Route::prefix('checkout')->group(function () {
+        // 取得要結帳的資料
+        Route::post('/product', [CheckoutApi::class, 'checkoutProduct']);
     });
     
 });
