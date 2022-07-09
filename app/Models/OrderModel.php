@@ -22,7 +22,7 @@ class Order extends Model
     protected $fillable = [
         'orderId',
         'orderNumber',
-        'clientId',
+        'userId',
         'invoiceHeader',
         'invoiceNumber',
         'randomNumber',
@@ -34,14 +34,13 @@ class Order extends Model
         'carrierType',
         'carrierId',
         'amount',
-        'cashIncome',
-        'cashChange',
         'salesAmount',
         'freeTaxSalesAmount',
         'totalAmount',
         'taxAmount',
         'zeroTaxSalesAmount',
         'payMethod',
+        'payTime',
         'receiveName',
         'receivePhone',
         'receiveAddress',
@@ -51,5 +50,15 @@ class Order extends Model
 
 class OrderModel
 {
-    
+    // 寫入
+    public static function insert_order_db($order)
+    {
+        Order::create($order);
+    }
+
+    // 更新
+    public static function update_order_db($orderNumber , $order)
+    {
+        Order::where('orderNumber',$orderNumber)->update($order);
+    }
 }
