@@ -37,6 +37,36 @@ class ProductDetail extends Model
 
 class ProductDetailModel
 {
+    // 商品子項寫入
+    public static function insert_product_detail_db($productDetail)
+    {
+        ProductDetail::create($productDetail);
+    }
+
+    // 商品子項上下架
+    public static function update_product_detail_enable_db($productDetailId,$enable)
+    {
+        ProductDetail::where('productDetailId',$productDetailId)->update(['enable'=>$enable]);
+    }
+
+    // 商品子項更新
+    public static function update_product_detail_db($productDetailId,$productDetail)
+    {
+        ProductDetail::where('productDetailId',$productDetailId)->update($productDetail);
+    }
+
+    // 商品子項刪除
+    public static function delete_product_detail_db($productDetailId)
+    {
+        ProductDetail::where('productDetailId',$productDetailId)->delete();
+    }
+
+    // 商品子項改排序
+    public static function update_product_detail_sort_db($productDetailId,$sort)
+    {
+        ProductDetail::where('productDetailId',$productDetailId)->update(['sort'=>$sort]);
+    }
+
     // 抓商品細項資料
     public static function select_product_detail_with_productId_db($productId)
     {
@@ -71,35 +101,5 @@ class ProductDetailModel
                            WHERE productId = '$productId' AND enable = 1 AND quantity > 0 
                            ORDER BY unitPrice ASC 
                            LIMIT 1 ");
-    }
-
-    // 商品子項寫入
-    public static function insert_product_detail_db($productDetail)
-    {
-        ProductDetail::create($productDetail);
-    }
-
-    // 商品子項上下架
-    public static function update_product_detail_enable_db($productDetailId,$enable)
-    {
-        ProductDetail::where('productDetailId',$productDetailId)->update(['enable'=>$enable]);
-    }
-
-    // 商品子項更新
-    public static function update_product_detail_db($productDetailId,$productDetail)
-    {
-        ProductDetail::where('productDetailId',$productDetailId)->update($productDetail);
-    }
-
-    // 商品子項刪除
-    public static function delete_product_detail_db($productDetailId)
-    {
-        ProductDetail::where('productDetailId',$productDetailId)->delete();
-    }
-
-    // 商品子項改排序
-    public static function update_product_detail_sort_db($productDetailId,$sort)
-    {
-        ProductDetail::where('productDetailId',$productDetailId)->update(['sort'=>$sort]);
-    }
+    }    
 }

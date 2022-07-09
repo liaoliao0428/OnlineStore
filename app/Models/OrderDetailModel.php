@@ -32,5 +32,9 @@ class OrderDetail extends Model
 
 class OrderDetailModel 
 {
-    
+    // 新增
+    public static function insert_order_detail_db($orderDetail)
+    {
+        OrderDetail::insert($orderDetail);
+    }
 }

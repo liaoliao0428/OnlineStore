@@ -57,7 +57,6 @@ class CartApi extends Controller
     // 購物車新增資料
     public function insert(Request $request)
     {
-        // return $request;
         $cart['userId'] = $request->userId;
         $cart['productDetailId'] = $request->productDetailId;
         $cart['quantity'] = (int)$request->quantity;
@@ -83,5 +82,12 @@ class CartApi extends Controller
         CartModel::delete_cart_db($userId , $productDetailId);
 
         return response()->json([true], Response::HTTP_OK);          
-    }    
+    }
+    
+    // 成立訂單後刪除購物車資料
+    public function deleteCartProduct($userId , $checkoutProduct)
+    {
+        // 刪除購物車資料
+        CartModel::delete_cart_db($userId , $checkoutProduct);
+    }
 }

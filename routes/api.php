@@ -30,6 +30,8 @@ use App\Http\Controllers\Frontend\Cart\CartApi;
 
 use App\Http\Controllers\Frontend\Checkout\CheckoutApi;
 
+use App\Http\Controllers\Frontend\Order\OrderApi;
+use App\Http\Controllers\Frontend\Order\OrderDetailApi;
 /************************************ frontStage API Contorller************************************ */
 
 
@@ -168,10 +170,19 @@ Route::prefix('frontend')->group(function () {
         Route::delete('/delete', [CartApi::class, 'delete']);
     });
 
-     // Checkout
-     Route::prefix('checkout')->group(function () {
+    // Checkout
+    Route::prefix('checkout')->group(function () {
+        // 結帳
+        Route::post('/', [CheckoutApi::class, 'checkout']);
+        // 綠界結帳結果回傳
+        Route::post('/ecpayPaymentCheckoutResponse', [CheckoutApi::class, 'ecpayPaymentCheckoutResponse']);
         // 取得要結帳的資料
         Route::post('/product', [CheckoutApi::class, 'checkoutProduct']);
+    });
+
+    // Order
+    Route::prefix('order')->group(function () {
+
     });
     
 });
