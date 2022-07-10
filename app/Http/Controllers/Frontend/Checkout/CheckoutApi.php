@@ -11,12 +11,15 @@ use App\Http\Controllers\Frontend\Order\OrderApi;
 use App\Http\Controllers\Frontend\Order\OrderDetailApi;
 
 use App\Models\CartModel;
-// use App\Models\ProductModel;
-// use App\Models\ProductDetailModel;
-// use App\Models\ProductImageModel;
+
+use App\Models\OrderModel;
+use App\Models\OrderDetailModel;
+
+use App\Models\ProductModel;
+use App\Models\ProductDetailModel;
 
 use App\Http\Traits\Ecpay\PaymentTrait;
-use App\Http\Traits\ToolTrait;
+use App\Http\Traits\Ecpay\InvoiceTrait;
 
 use App\Http\Controllers\Controller;
 
@@ -54,81 +57,39 @@ class CheckoutApi extends Controller
     // 結帳
     public function checkout(Request $request)
     {
-        $userId = $request->userId;
-        $totalPrice = $request->totalPrice;
-        $checkoutProducts = $request->checkoutProducts;
-        $payMedhod = $request->payMedhod;
-        $clientBackUrl = 'http://localhost:3000/user/order';
+        $userId = $request->userId;       
+        $checkoutType = $request->checkoutType;   // 結帳型態 1->無訂單 先結單
         
-        // 訂單寫入資料庫
-        $orderIdentify = $this->insertOrder($userId , $totalPrice);
-        // 訂單細項寫入資料庫
-        $this->insertOrderDetail($userId , $orderIdentify['orderId'] , $checkoutProducts);
-        
-
-        // 付款 1->綠界信用卡、2->linepay
-        switch ($payMedhod){
+        switch($checkoutType){
             case 1:
-                $this->ecpayPayment($orderIdentify['orderNumber'] , $userId , $checkoutProducts , $totalPrice , $clientBackUrl);
+                $this->checkoutNoOrder($userId , $request);
             break;
 
             case 2:
-                $this->linepay();
+                $this->checkoutWithOrder($userId , $request);
             break;
-        }       
-        
-        // 刪除已成立訂單的購物車商品
-        $this->deleteCartProduct($userId , $checkoutProducts);
-    }
-
-    // 綠界結帳
-    public function ecpayPayment($orderNumber , $userId , $checkoutProducts , $totalPrice , $clientBackUrl)
-    {
-        $CartApi = new CartApi();
-        $itemName = '';
-        foreach($checkoutProducts as $checkoutProduct){
-            $productDetailId = $checkoutProduct['productDetailId'];
-            $carts = CartModel::select_cart_where_userId_productDetailId_db($userId , $productDetailId);
-            // 購物車陣列資料處理 並塞回要結帳的資料中
-            $carts = $CartApi->setCartArray($carts);
-            // 組合綠界結帳要的商品字串
-            $itemName = $itemName . $carts[0]->productName . ' ' . $carts[0]->unitPrice . '元' . ' ' . 'x' . $carts[0]->quantity . '#';
         }
-
-        $returnUrl = 'http://192.168.1.106/OnlineStore/Backend/public/api/checkout/ecpayPaymentCheckoutResponse'; // 訂單付款狀態response
-
-        PaymentTrait::aioCheckOut($orderNumber , $itemName , $totalPrice , $returnUrl , $clientBackUrl);
     }
 
-    // 綠界結帳結果回傳
-    public function ecpayPaymentCheckoutResponse(Request $request)
+    // 無訂單結帳 先建立訂單在跑結帳
+    public function checkoutNoOrder($userId , $request)
     {
-        $orderNumber = $request->MerchantTradeNo;
-        $RtnCode = $request->RtnCode;
-        $order['payMethod'] = $request->PaymentDate;
-        $order['payTime'] = $request->PaymentType;
+        $totalPrice = $request->totalPrice;
+        $checkoutProducts = $request->checkoutProducts;
+        $payMedhod = $request->payMedhod;   // 付款方式 
 
-        // $RtnCode == 1 代表付款成功 更新復付款狀態以及時間
-        if($RtnCode == 1){
-            $orderApi = new OrderApi();
-            $orderApi->update($orderNumber , $order);
-        }
-
-        return 1;
-    }
-
-    // linepay結帳
-    public function linepay()
-    {
-
+        // 訂單寫入資料庫
+        $orderNumber = $this->insertOrder($userId , $totalPrice);
+        // 訂單細項寫入資料庫
+        $this->insertOrderDetail($userId , $orderNumber , $checkoutProducts);
+        // 付款
+        $this->pay($userId , $payMedhod , $orderNumber);             
     }
 
     // 訂單寫入資料庫
     public function insertOrder($userId , $totalPrice)
     {
-        $orderId = ToolTrait::randomString(13);
         $orderNumber = time();
-        $order['orderId'] = $orderId;
         $order['orderNumber'] = $orderNumber;
         $order['userId'] = $userId;
         $order['taxType'] = 1;
@@ -144,16 +105,13 @@ class CheckoutApi extends Controller
         $orderApi = new OrderApi();
         $orderApi->insert($order);
 
-        return [
-            'orderId' => $orderId,
-            'orderNumber' => $orderNumber
-        ];
+        return $orderNumber;
     }
 
     // 訂單細項寫入資料庫
-    public function insertOrderDetail($userId , $orderId , $checkoutProducts)
+    public function insertOrderDetail($userId , $orderNumber , $checkoutProducts)
     {
-        $orderDetail['orderId'] = $orderId;
+        $orderDetail['orderNumber'] = $orderNumber;
         $orderDetail['createTime'] = date('Y-m-d H:i:s');
         $orderDetail['updateTime'] = date('Y-m-d H:i:s');
 
@@ -175,14 +133,93 @@ class CheckoutApi extends Controller
         $OrderDetailApi->insert($orderDetails);
     }
 
+    // 有訂單結帳
+    public function checkoutWithOrder($userId , $request)
+    {
+        $orderNumber = $request->orderNumber;
+        $payMedhod = $request->payMedhod;   // 付款方式 
+
+        // 付款
+        $this->pay($userId , $payMedhod , $orderNumber); 
+    }
+
+    // 付款
+    public function pay($userId , $payMedhod , $orderNumber)
+    {
+        $clientBackUrl = 'http://localhost:3000/user/order';
+
+        // 付款 1->綠界信用卡、2->linepay
+        switch ($payMedhod){
+            case 1:
+                $this->ecpayPayment($orderNumber , $clientBackUrl);
+            break;
+
+            case 2:
+                $this->linepay();
+            break;
+        }
+        
+        // 刪除已成立訂單的購物車商品
+        // $this->deleteCartProduct($userId , $orderNumber);
+    }
+
+    // 綠界結帳
+    public function ecpayPayment($orderNumber , $clientBackUrl)
+    {
+        $itemName = '';
+        $checkoutProducts = OrderDetailModel::select_order_detail_db($orderNumber);
+        $order = OrderModel::select_order_where_orderNumber_db($orderNumber);
+        foreach($checkoutProducts as $checkoutProduct){
+            $productDetailId = $checkoutProduct->productDetailId;
+            $productDetail = ProductDetailModel::select_product_detail_with_productDetailId_db($productDetailId);
+            $productId = $productDetail[0]->productId;
+            $product = ProductModel::select_product_with_productId_db($productId);
+            // 組合綠界結帳要的商品字串
+            $itemName = $itemName . $product[0]->productName . ' - ' . $productDetail[0]->productDetailName . ' ' . $checkoutProduct->unitPrice . '元' . ' ' . 'x' . $checkoutProduct->quantity . '#';
+        }
+
+        $returnUrl = 'http://192.168.1.106/OnlineStore/Backend/public/api/checkout/ecpayPaymentCheckoutResponse'; // 訂單付款狀態response
+
+        PaymentTrait::aioCheckOut($orderNumber , $itemName , $order[0]->amount , $returnUrl , $clientBackUrl);
+    }
+
+    // 綠界結帳結果回傳
+    public function ecpayPaymentCheckoutResponse(Request $request)
+    {
+        $orderNumber = $request->MerchantTradeNo;
+        $RtnCode = $request->RtnCode;
+        $order['payMethod'] = $request->PaymentDate;
+        $order['payTime'] = $request->PaymentType;
+
+        // $RtnCode == 1 代表付款成功 更新復付款狀態以及時間
+        if($RtnCode == 1){
+            $orderApi = new OrderApi();
+            $orderApi->update($orderNumber , $order);
+        }
+
+        return '1|OK';
+    }    
+
+    // linepay結帳
+    public function linepay()
+    {
+
+    }
+
+    // 成功開發票
+    public function generateInvoice($orderNumber)
+    {
+        InvoiceTrait::Issue();
+    }
 
     // 刪除已成立訂單的購物車商品
-    public function deleteCartProduct($userId , $checkoutProducts)
+    public function deleteCartProduct($userId , $orderNumber)
     {
         $CartApi = new CartApi();
+        $checkoutProducts = OrderDetailModel::select_order_detail_db($orderNumber);
         foreach($checkoutProducts as $checkoutProduct)
         {
-            $CartApi->deleteCartProduct($userId , $checkoutProduct);
+            $CartApi->deleteCartProduct($userId , $checkoutProduct->productDetailId);
         }        
     }
 }

@@ -99,7 +99,7 @@ trait InvoiceTrait
     }
 
     // 開立發票
-    public function Issue()
+    public static function Issue()
     {
         $data = [
             "MerchantID" => InvoiceTrait::$MerchantID,
