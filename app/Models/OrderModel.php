@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
@@ -20,7 +21,6 @@ class Order extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'orderId',
         'orderNumber',
         'userId',
         'invoiceHeader',
@@ -60,5 +60,11 @@ class OrderModel
     public static function update_order_db($orderNumber , $order)
     {
         Order::where('orderNumber',$orderNumber)->update($order);
+    }
+    
+    // 抓訂單資料
+    public static function select_order_where_orderNumber_db($orderNumber)
+    {
+        return DB::select("SELECT * FROM `order` WHERE orderNumber = '$orderNumber'");
     }
 }
