@@ -36,6 +36,19 @@ class CheckoutApi extends Controller
         $userId = $request->userId;
         $checkoutPorudctDetailIds = $request->checkoutPorudctDetailIds;
 
+        // 結帳商品陣列組合
+        $checkoutProducts = $this->setCheckoutProducts($userId , $checkoutPorudctDetailIds);
+
+        if(!empty($checkoutProducts)){
+            return response()->json(['checkoutProducts' => $checkoutProducts], Response::HTTP_OK);  
+        }else{
+            return response()->json(['checkoutProducts' => null], Response::HTTP_OK);  
+        }
+    }
+
+    // 結帳商品陣列組合
+    public function setCheckoutProducts($userId , $checkoutPorudctDetailIds)
+    {
         $checkoutProducts = [];
 
         $CartApi = new CartApi();
@@ -47,18 +60,14 @@ class CheckoutApi extends Controller
             $checkoutProducts[] = $carts[0];
         }
 
-        if(!empty($checkoutProducts)){
-            return response()->json(['checkoutProducts' => $checkoutProducts], Response::HTTP_OK);  
-        }else{
-            return response()->json(['checkoutProducts' => null], Response::HTTP_OK);  
-        }
+        return $checkoutProducts;
     }
 
     // 結帳
     public function checkout(Request $request)
     {
         $userId = $request->userId;       
-        $checkoutType = $request->checkoutType;   // 結帳型態 1->無訂單 先結單
+        $checkoutType = $request->checkoutType;   // 結帳型態 1->無訂單 先建立單在結帳、2->有訂單 直接抓訂單編號結帳
         
         switch($checkoutType){
             case 1:
@@ -97,11 +106,6 @@ class CheckoutApi extends Controller
         $order['amount'] = $totalPrice;
         $order['orderStatus'] = 1;
 
-        // 下兩個欄位測試用 等掛上網域可以接收綠type後刪除
-        $order['payMethod'] = 1;
-        $order['payTime'] = date('Y-m-d H:i:s');
-        // 上兩個欄位測試用 等掛上網域可以接收綠type後刪除
-
         $orderApi = new OrderApi();
         $orderApi->insert($order);
 
@@ -110,6 +114,16 @@ class CheckoutApi extends Controller
 
     // 訂單細項寫入資料庫
     public function insertOrderDetail($userId , $orderNumber , $checkoutProducts)
+    {
+        // 組合訂單細項陣列
+        $orderDetails = $this->setOrderDetails($userId , $orderNumber ,  $checkoutProducts);
+        
+        $OrderDetailApi = new OrderDetailApi();
+        $OrderDetailApi->insert($orderDetails);
+    }
+
+    // 組合訂單細項陣列
+    public function setOrderDetails($userId , $orderNumber , $checkoutProducts)
     {
         $orderDetail['orderNumber'] = $orderNumber;
         $orderDetail['createTime'] = date('Y-m-d H:i:s');
@@ -128,9 +142,8 @@ class CheckoutApi extends Controller
             $orderDetail['amount'] = (int)$carts[0]->unitPrice * (int)$carts[0]->quantity;
             $orderDetails[] = $orderDetail;
         }
-        
-        $OrderDetailApi = new OrderDetailApi();
-        $OrderDetailApi->insert($orderDetails);
+
+        return $orderDetails;
     }
 
     // 有訂單結帳
@@ -155,20 +168,30 @@ class CheckoutApi extends Controller
             break;
 
             case 2:
-                $this->linepay();
+                $this->linepay($orderNumber , $clientBackUrl);
             break;
         }
         
         // 刪除已成立訂單的購物車商品
-        // $this->deleteCartProduct($userId , $orderNumber);
+        $this->deleteCartProduct($userId , $orderNumber);
     }
 
     // 綠界結帳
     public function ecpayPayment($orderNumber , $clientBackUrl)
     {
-        $itemName = '';
         $checkoutProducts = OrderDetailModel::select_order_detail_db($orderNumber);
         $order = OrderModel::select_order_where_orderNumber_db($orderNumber);
+
+        // 組合綠界結帳需要商品字串
+        $itemName = $this->setItemName($checkoutProducts);
+
+        PaymentTrait::aioCheckOut($orderNumber , $order[0]->amount , $itemName ,  $clientBackUrl);
+    }
+
+    // 組合綠界結帳需要商品字串
+    public function setItemName($checkoutProducts)
+    {
+        $itemName = '';
         foreach($checkoutProducts as $checkoutProduct){
             $productDetailId = $checkoutProduct->productDetailId;
             $productDetail = ProductDetailModel::select_product_detail_with_productDetailId_db($productDetailId);
@@ -178,9 +201,13 @@ class CheckoutApi extends Controller
             $itemName = $itemName . $product[0]->productName . ' - ' . $productDetail[0]->productDetailName . ' ' . $checkoutProduct->unitPrice . '元' . ' ' . 'x' . $checkoutProduct->quantity . '#';
         }
 
-        $returnUrl = 'http://192.168.1.106/OnlineStore/Backend/public/api/checkout/ecpayPaymentCheckoutResponse'; // 訂單付款狀態response
+        return $itemName;
+    }
 
-        PaymentTrait::aioCheckOut($orderNumber , $itemName , $order[0]->amount , $returnUrl , $clientBackUrl);
+    // linepay結帳
+    public function linepay($orderNumber , $clientBackUrl)
+    {
+
     }
 
     // 綠界結帳結果回傳
@@ -188,28 +215,76 @@ class CheckoutApi extends Controller
     {
         $orderNumber = $request->MerchantTradeNo;
         $RtnCode = $request->RtnCode;
-        $order['payMethod'] = $request->PaymentDate;
-        $order['payTime'] = $request->PaymentType;
+        $order['payMethod'] = $request->PaymentType;
+        $order['payTime'] = $request->PaymentDate;        
 
         // $RtnCode == 1 代表付款成功 更新復付款狀態以及時間
         if($RtnCode == 1){
             $orderApi = new OrderApi();
-            $orderApi->update($orderNumber , $order);
+            $orderApi->update($orderNumber , $order);   // 更新付款狀態
+            $this->generateInvoice($orderNumber);   // 付款成功開發票
         }
 
         return '1|OK';
     }    
 
-    // linepay結帳
-    public function linepay()
-    {
-
-    }
-
-    // 成功開發票
+    // 開立綠界發票
     public function generateInvoice($orderNumber)
     {
-        InvoiceTrait::Issue();
+        $order = OrderModel::select_order_where_orderNumber_db($orderNumber);
+        $orderDetailProducts = OrderDetailModel::select_order_detail_db($orderNumber);
+
+        $salesAmount = $order[0]->amount - $order[0]->deliveryFee;
+
+        // 組合開立綠界發票陣列
+        $orderProductAarray = $this->setOrderProductArray($orderDetailProducts);
+
+        // 綠界開發票回傳
+        $invoiceData = InvoiceTrait::Issue($orderNumber , $salesAmount , $orderProductAarray);
+
+        // 發票開立成功更新訂單發票資訊
+        if($invoiceData['Data']['RtnCode'] == 1){
+            $this->updateOrderInvoice($orderNumber);
+        }
+    }
+
+    // 組合開立綠界發票陣列
+    public function setOrderProductArray($orderDetailProducts)
+    {
+        $orderProductAarray = [];
+        $orderProduct = [];
+        foreach($orderDetailProducts as $index => $orderDetailProduct){
+            $productDetailId = $orderDetailProduct->productDetailId;
+            $productDetail = ProductDetailModel::select_product_detail_with_productDetailId_db($productDetailId);
+
+            $orderProduct['ItemSeq'] = $index + 1;
+            $orderProduct['ItemName'] = $productDetail[0]->productDetailName;
+            $orderProduct['ItemCount'] = $orderDetailProduct->quantity;
+            $orderProduct['ItemWord'] = $productDetail[0]->specification;
+            $orderProduct['ItemPrice'] = $orderDetailProduct->unitPrice;
+            $orderProduct['ItemTaxType'] = "1";
+            $orderProduct['ItemAmount'] = $orderDetailProduct->quantity * $orderDetailProduct->unitPrice;
+            $orderProductAarray[] = $orderProduct;
+        }
+        
+        return $orderProductAarray;
+    }
+
+    // 更新訂單發票資訊
+    public function updateOrderInvoice($orderNumber)
+    {
+        // 綠界取得發票資訊
+        $invoiceData = InvoiceTrait::GetIssue($orderNumber);
+
+        $order['invoiceNumber'] = $invoiceData['Data']['IIS_Number'];
+        $order['randomNumber'] = $invoiceData['Data']['IIS_Random_Number'];
+        $order['invoiceDate'] = $invoiceData['Data']['IIS_Create_Date'];
+        $order['taxType'] = $invoiceData['Data']['IIS_Tax_Type'];
+        $order['invoiceDonate'] = 0;
+        $order['taxAmount'] = $invoiceData['Data']['IIS_Tax_Amount'];
+
+        $orderApi = new OrderApi();
+        $orderApi->update($orderNumber , $order);
     }
 
     // 刪除已成立訂單的購物車商品

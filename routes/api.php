@@ -178,6 +178,9 @@ Route::prefix('frontend')->group(function () {
         Route::post('/ecpayPaymentCheckoutResponse', [CheckoutApi::class, 'ecpayPaymentCheckoutResponse']);
         // 取得要結帳的資料
         Route::post('/product', [CheckoutApi::class, 'checkoutProduct']);
+
+        // 開發票測試
+        Route::post('/generateInvoice', [CheckoutApi::class, 'generateInvoice']);
     });
 
     // Order

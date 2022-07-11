@@ -2,14 +2,8 @@
 
 namespace App\Http\Traits\Ecpay;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-
 use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Services\UrlService;
-use Ecpay\Sdk\Exceptions\RtnException;
 
 trait PaymentTrait
 {
@@ -32,8 +26,11 @@ trait PaymentTrait
     }
 
     // 建立訂單
-    public static function aioCheckOut($orderNumber , $itemName , $totalPrice , $returnUrl , $clientBackUrl)
+    public static function aioCheckOut($orderNumber , $totalPrice , $itemName ,  $clientBackUrl)
     {
+        // $returnUrl = 'http://192.168.1.106/OnlineStore/Backend/public/api/checkout/ecpayPaymentCheckoutResponse'; // 訂單付款狀態response
+        $returnUrl = 'http://6493-36-238-35-213.jp.ngrok.io/OnlineStore/Backend/public/api/frontend/checkout/ecpayPaymentCheckoutResponse'; // 訂單付款狀態response 現在使用ngrok 之後上線改正式
+
         $input = [
             'MerchantID' => PaymentTrait::$MerchantID,
             'MerchantTradeNo' => $orderNumber,
