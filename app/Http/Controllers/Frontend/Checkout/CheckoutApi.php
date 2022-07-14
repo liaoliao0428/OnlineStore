@@ -20,6 +20,7 @@ use App\Models\ProductDetailModel;
 
 use App\Http\Traits\Ecpay\PaymentTrait;
 use App\Http\Traits\Ecpay\InvoiceTrait;
+use App\Http\Traits\Ecpay\LogisticsTrait;
 
 use App\Http\Controllers\Controller;
 
@@ -27,7 +28,7 @@ class CheckoutApi extends Controller
 {
     public function __construct()
     {
-        $this->middleware('frontAuthCheck')->except('ecpayPaymentCheckoutResponse');
+        $this->middleware('frontAuthCheck')->except('ecpayPaymentCheckoutResponse' , 'generateLogisticsOrder');
     }
 
     // 取得要結帳的資料
@@ -112,7 +113,7 @@ class CheckoutApi extends Controller
         return $orderNumber;
     }
 
-    // 訂單細項寫入資料庫
+    // 訂單細項寫入資料庫 並刪除庫存
     public function insertOrderDetail($userId , $orderNumber , $checkoutProducts)
     {
         // 組合訂單細項陣列
@@ -120,6 +121,8 @@ class CheckoutApi extends Controller
         
         $OrderDetailApi = new OrderDetailApi();
         $OrderDetailApi->insert($orderDetails);
+
+        // 並刪除庫存
     }
 
     // 組合訂單細項陣列
@@ -173,7 +176,7 @@ class CheckoutApi extends Controller
         }
         
         // 刪除已成立訂單的購物車商品
-        $this->deleteCartProduct($userId , $orderNumber);
+        // $this->deleteCartProduct($userId , $orderNumber);
     }
 
     // 綠界結帳
@@ -296,5 +299,15 @@ class CheckoutApi extends Controller
         {
             $CartApi->deleteCartProduct($userId , $checkoutProduct->productDetailId);
         }        
+    }
+
+    // 綠界物流
+    public function generateLogisticsOrder(Request $request)
+    {
+        $testData = LogisticsTrait::createTestData();
+        $clientReplyUrl = 123;
+        if($testData['Data']['RtnCode'] == 1){
+            LogisticsTrait::redirectToLogisticsSelection($clientReplyUrl);
+        }
     }
 }
