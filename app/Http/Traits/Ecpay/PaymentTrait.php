@@ -29,7 +29,7 @@ trait PaymentTrait
     public static function aioCheckOut($orderNumber , $totalPrice , $itemName ,  $clientBackUrl)
     {
         // $returnUrl = 'http://192.168.1.106/OnlineStore/Backend/public/api/checkout/ecpayPaymentCheckoutResponse'; // 訂單付款狀態response
-        $returnUrl = 'http://6493-36-238-35-213.jp.ngrok.io/OnlineStore/Backend/public/api/frontend/checkout/ecpayPaymentCheckoutResponse'; // 訂單付款狀態response 現在使用ngrok 之後上線改正式
+        $returnUrl = env('ECPAY_RETURN_URL_DOMAIN') . '/OnlineStore/Backend/public/api/frontend/checkout/ecpayPaymentCheckoutResponse'; // 訂單付款狀態response 現在使用ngrok 之後上線改正式
 
         $input = [
             'MerchantID' => PaymentTrait::$MerchantID,
