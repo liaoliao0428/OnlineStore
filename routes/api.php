@@ -188,10 +188,13 @@ Route::prefix('frontend')->group(function () {
     Route::prefix('checkout')->group(function () {
         // 結帳
         Route::post('/', [CheckoutApi::class, 'checkout']);
-        // 綠界結帳結果回傳
-        Route::post('/ecpayPaymentCheckoutResponse', [CheckoutApi::class, 'ecpayPaymentCheckoutResponse']);
         // 取得要結帳的資料
         Route::post('/product', [CheckoutApi::class, 'checkoutProduct']);
+        // 取得使用者目前預設物流
+        Route::post('/getReceiverDefaultAddress', [CheckoutApi::class, 'getReceiverDefaultAddress']);
+        // 綠界結帳結果回傳
+        Route::post('/ecpayPaymentCheckoutResponse', [CheckoutApi::class, 'ecpayPaymentCheckoutResponse']);
+        
     });
 
     // Order
