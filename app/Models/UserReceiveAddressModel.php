@@ -22,11 +22,11 @@ class UserReceiveAddress extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'reveiveAddressId',
+        'receiveAddressId',
         'userId',
         'receiverName',
         'receiverCellPhone',
-        'reveiverStoreType',
+        'receiverStoreType',
         'receiverStoreName',
         'receiverAddress',
         'defaultAddress',
@@ -42,15 +42,15 @@ class UserReceiveAddressModel
     }
 
     // 編輯
-    public static function update_user_receive_address_db($reveiveAddressId , $userReceiveAddress)
+    public static function update_user_receive_address_db($receiveAddressId , $userReceiveAddress)
     {
-        UserReceiveAddress::where('reveiveAddressId',$reveiveAddressId)->update($userReceiveAddress);
+        UserReceiveAddress::where('receiveAddressId',$receiveAddressId)->update($userReceiveAddress);
     }
 
     // 刪除
-    public static function delete_user_receive_address_db($reveiveAddressId)
+    public static function delete_user_receive_address_db($receiveAddressId)
     {
-        UserReceiveAddress::where('reveiveAddressId',$reveiveAddressId)->delete();
+        UserReceiveAddress::where('receiveAddressId',$receiveAddressId)->delete();
     }
 
     // 把原本的預設的變成0
@@ -63,6 +63,12 @@ class UserReceiveAddressModel
     public static function select_user_receive_address_db($userId)
     {
         return DB::select("SELECT * FROM user_receive_address WHERE userId = '$userId' ORDER BY createTime ASC");
+    }
+
+    // 撈使用者預設地址
+    public static function select_user_receive_address_default_db($userId)
+    {
+        return DB::select("SELECT * FROM user_receive_address WHERE userId = '$userId' AND defaultAddress = 1");
     }
 }
 

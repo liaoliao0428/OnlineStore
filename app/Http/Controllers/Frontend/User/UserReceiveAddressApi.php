@@ -31,7 +31,7 @@ class UserReceiveAddressApi extends Controller
         $userReceiveAddresss = UserReceiveAddressModel::select_user_receive_address_db($userId);
 
         // 判斷物流類型
-        $this->setReveiverStoreType($userReceiveAddresss);
+        $this->setreceiverStoreType($userReceiveAddresss);
 
         // 回傳
         if($userReceiveAddresss){
@@ -42,25 +42,25 @@ class UserReceiveAddressApi extends Controller
     }
 
     // 判斷物流類型
-    public function setReveiverStoreType($userReceiveAddresss)
+    public function setreceiverStoreType($userReceiveAddresss)
     {
         foreach($userReceiveAddresss as $userReceiveAddress){
-            $reveiverStoreType = $userReceiveAddress->reveiverStoreType;
-            switch($reveiverStoreType){
+            $receiverStoreType = $userReceiveAddress->receiverStoreType;
+            switch($receiverStoreType){
                 case 'FAMI': case 'FAMIC2C':
-                    $userReceiveAddress->reveiverStoreType = '全家';
+                    $userReceiveAddress->receiverStoreType = '全家';
                 break;
 
                 case 'UNIMART': case 'UNIMARTFREEZE': case 'UNIMARTC2C':
-                    $userReceiveAddress->reveiverStoreType = '7-11';
+                    $userReceiveAddress->receiverStoreType = '7-11';
                 break;
 
                 case 'HILIFE': case 'HILIFEC2C': case 'OKMARTC2C':
-                    $userReceiveAddress->reveiverStoreType = '萊爾富';
+                    $userReceiveAddress->receiverStoreType = '萊爾富';
                 break;
 
                 case 'OKMARTC2C': 
-                    $userReceiveAddress->reveiverStoreType = 'OK';
+                    $userReceiveAddress->receiverStoreType = 'OK';
                 break;
             }
         }
@@ -75,9 +75,9 @@ class UserReceiveAddressApi extends Controller
     // 刪除
     public function delete(Request $request)
     {
-        $reveiveAddressId = $request->reveiveAddressId;
+        $receiveAddressId = $request->receiveAddressId;
 
-        UserReceiveAddressModel::delete_user_receive_address_db($reveiveAddressId);
+        UserReceiveAddressModel::delete_user_receive_address_db($receiveAddressId);
         return response()->json([true], Response::HTTP_OK);
     }
 
@@ -85,11 +85,11 @@ class UserReceiveAddressApi extends Controller
     public function changeDefaultReceiveAddress(Request $request)
     {
         $userId = $request->userId;
-        $reveiveAddressId = $request->reveiveAddressId;
+        $receiveAddressId = $request->receiveAddressId;
         $userReceiveAddress['defaultAddress'] = 1;
 
         UserReceiveAddressModel::update_user_receive_address_where_defaultAddress1_db($userId);
-        UserReceiveAddressModel::update_user_receive_address_db($reveiveAddressId , $userReceiveAddress);
+        UserReceiveAddressModel::update_user_receive_address_db($receiveAddressId , $userReceiveAddress);
 
         return response()->json([true], Response::HTTP_OK);
     }
@@ -120,11 +120,11 @@ class UserReceiveAddressApi extends Controller
         // RtnCode == 1 代表選擇成功 寫入資料庫
         if($logisticsData['RtnCode'] == 1){
 
-            $userReceiveAddress['reveiveAddressId'] = ToolTrait::randomString(13);
+            $userReceiveAddress['receiveAddressId'] = ToolTrait::randomString(13);
             $userReceiveAddress['userId'] = $userId;
             $userReceiveAddress['receiverName'] = $logisticsData['ReceiverName'];
             $userReceiveAddress['receiverCellPhone'] = $logisticsData['ReceiverCellPhone'];
-            $userReceiveAddress['reveiverStoreType'] = $logisticsData['LogisticsSubType'];
+            $userReceiveAddress['receiverStoreType'] = $logisticsData['LogisticsSubType'];
             $userReceiveAddress['receiverStoreName'] = $logisticsData['ReceiverStoreName'];
             $userReceiveAddress['receiverAddress'] = $logisticsData['ReceiverAddress'];
 

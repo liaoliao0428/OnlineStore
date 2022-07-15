@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 use App\Http\Controllers\Frontend\Cart\CartApi;
+use App\Http\Controllers\Frontend\User\UserReceiveAddressApi;
 
 use App\Http\Controllers\Frontend\Order\OrderApi;
 use App\Http\Controllers\Frontend\Order\OrderDetailApi;
@@ -17,6 +18,8 @@ use App\Models\OrderDetailModel;
 
 use App\Models\ProductModel;
 use App\Models\ProductDetailModel;
+
+use App\Models\UserReceiveAddressModel;
 
 use App\Http\Traits\Ecpay\PaymentTrait;
 use App\Http\Traits\Ecpay\InvoiceTrait;
@@ -308,6 +311,24 @@ class CheckoutApi extends Controller
         $clientReplyUrl = 123;
         if($testData['Data']['RtnCode'] == 1){
             LogisticsTrait::redirectToLogisticsSelection($clientReplyUrl);
+        }
+    }
+
+    // 取得使用者目前預設物流
+    public function getReceiverDefaultAddress(Request $request)
+    {
+        $userId = $request->userId;
+
+        $receiverDefaultAddress = UserReceiveAddressModel::select_user_receive_address_default_db($userId);
+
+        // 判斷物流類型
+        $userReceiveAddressApi = new UserReceiveAddressApi();
+        $userReceiveAddressApi->setreceiverStoreType($receiverDefaultAddress);
+
+        if(!empty($receiverDefaultAddress)){
+            return response()->json(['receiverDefaultAddress' => $receiverDefaultAddress[0]], Response::HTTP_OK);  
+        }else{
+            return response()->json(['receiverDefaultAddress' => null], Response::HTTP_OK);  
         }
     }
 }
