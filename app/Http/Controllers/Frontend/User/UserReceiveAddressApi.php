@@ -99,7 +99,7 @@ class UserReceiveAddressApi extends Controller
     {
         $userId = $request->userId;
         $userIdBase64Encode = base64_encode($userId);
-
+        
         $clientReplyUrl = env('ECPAY_RETURN_URL_DOMAIN') . '/OnlineStore/Backend/public/api/frontend/userReceiveAddress/ecpayLogisticsSelectionResponse/' . $userIdBase64Encode;
         
         LogisticsTrait::redirectToLogisticsSelection($clientReplyUrl);
@@ -126,6 +126,7 @@ class UserReceiveAddressApi extends Controller
             $userReceiveAddress['receiverCellPhone'] = $logisticsData['ReceiverCellPhone'];
             $userReceiveAddress['receiverStoreType'] = $logisticsData['LogisticsSubType'];
             $userReceiveAddress['receiverStoreName'] = $logisticsData['ReceiverStoreName'];
+            $userReceiveAddress['receiverStoreID'] = $logisticsData['ReceiverStoreID'];
             $userReceiveAddress['receiverAddress'] = $logisticsData['ReceiverAddress'];
 
             $this->insert($userReceiveAddress);

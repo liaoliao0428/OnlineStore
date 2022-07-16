@@ -32,11 +32,11 @@ trait LogisticsTrait
     }
 
     // 一段標測試資料產生(B2C)
-    public static function createTestData()
+    public static function createTestData($receiverStoreType)
     {        
         $data = [
             'MerchantID' => LogisticsTrait::$MerchantID,
-            'LogisticsSubType' => 'UNIMART',
+            'LogisticsSubType' => $receiverStoreType,
         ];
 
         $input = [
@@ -54,7 +54,7 @@ trait LogisticsTrait
     }
 
     // 開啟物流選擇頁
-    public static function redirectToLogisticsSelection($clientReplyUrl)
+    public static function redirectToLogisticsSelection($clientReplyUrl , $GoodsAmount = 100)
     {
         $factory = new Factory([
             'hashKey' => LogisticsTrait::$hashKey,
@@ -64,7 +64,8 @@ trait LogisticsTrait
         
         $data = [
             'TempLogisticsID' => '0',
-            'GoodsAmount' => 100,
+            'GoodsAmount' => $GoodsAmount,
+            'IsCollection' =>'Y',
             'GoodsName' => '範例商品',
             'SenderName' => '陳大明',
             'SenderZipCode' => '11560',
@@ -89,6 +90,27 @@ trait LogisticsTrait
         
         $response = $postService->post($input, $url);
         echo $response['body'];
+    }
+
+    // 更新暫時存物流訂單
+    public static function updateTempTrade()
+    {
+        $data = [
+            'TempLogisticsID' => 2000140,
+            'SenderName' => '王小美',
+        ];
+        $input = [
+            'MerchantID' => '2000132',
+            'RqHeader' => [
+                'Timestamp' => time(),
+                'Revision' => '1.0.0',
+            ],
+            'Data' => $data,
+        ];
+        $url = 'https://logistics-stage.ecpay.com.tw/Express/v2/UpdateTempTrade';
+
+        $response = LogisticsTrait::ecpayLogistics( $input , $url );
+        return $response;
     }
 
     // 建立正式物流訂單
@@ -131,4 +153,40 @@ trait LogisticsTrait
         $response = LogisticsTrait::ecpayLogistics( $input , $url );
         return $response;
     }
+
+    // 建立綠界物流訂單
+    public static function create($orderNumber , $receiverStoreType , $amount , $receiverName , $receiverCellPhone , $receiverStoreID)
+    {
+        $factory = new Factory([
+            'hashKey' => LogisticsTrait::$hashKey,
+            'hashIv' => LogisticsTrait::$hashIv,
+            'hashMethod' => 'md5',
+        ]);
+        $postService = $factory->create('PostWithCmvEncodedStrResponseService');
+    
+        $input = [
+            'MerchantID' => '2000132',
+            'MerchantTradeNo' => $orderNumber,
+            'MerchantTradeDate' => date('Y/m/d H:i:s'),
+            'LogisticsType' => 'CVS',
+            'LogisticsSubType' => $receiverStoreType,
+            'GoodsAmount' => $amount,
+            'GoodsName' => '綠界 SDK 範例商品',
+            'SenderName' => '陳大明',
+            'SenderCellPhone' => '0911222333',
+            'ReceiverName' => $receiverName,
+            'ReceiverCellPhone' => $receiverCellPhone,
+    
+            // 請參考 example/Logistics/Domestic/GetLogisticStatueResponse.php 範例開發
+            'ServerReplyURL' => 'https://www.ecpay.com.tw/example/server-reply',
+    
+            // 請參考 example/Logistics/Domestic/GetMapResponse.php 範例取得
+            'ReceiverStoreID' => $receiverStoreID,
+        ];
+        $url = 'https://logistics-stage.ecpay.com.tw/Express/Create';
+    
+        $response = $postService->post($input, $url);
+        return $response;
+    }
+
 }
