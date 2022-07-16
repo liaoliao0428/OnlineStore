@@ -28,6 +28,7 @@ class UserReceiveAddress extends Model
         'receiverCellPhone',
         'receiverStoreType',
         'receiverStoreName',
+        'receiverStoreID',
         'receiverAddress',
         'defaultAddress',
     ];
@@ -69,6 +70,12 @@ class UserReceiveAddressModel
     public static function select_user_receive_address_default_db($userId)
     {
         return DB::select("SELECT * FROM user_receive_address WHERE userId = '$userId' AND defaultAddress = 1");
+    }
+
+    // 撈指定receiveAddressId的地址
+    public static function selete_user_receive_address_where_receiveAddressId_db($receiveAddressId)
+    {
+        return DB::select("SELECT * FROM user_receive_address WHERE receiveAddressId = '$receiveAddressId'");
     }
 }
 

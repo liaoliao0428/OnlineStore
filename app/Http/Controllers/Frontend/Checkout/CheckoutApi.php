@@ -21,9 +21,15 @@ use App\Models\ProductDetailModel;
 
 use App\Models\UserReceiveAddressModel;
 
+use App\Http\Traits\ToolTrait;
 use App\Http\Traits\Ecpay\PaymentTrait;
 use App\Http\Traits\Ecpay\InvoiceTrait;
 use App\Http\Traits\Ecpay\LogisticsTrait;
+use App\Http\Traits\Ecpay\EcpayEncryptDecryptTrait;
+
+
+use Ecpay\Sdk\Factories\Factory;
+
 
 use App\Http\Controllers\Controller;
 
@@ -31,7 +37,7 @@ class CheckoutApi extends Controller
 {
     public function __construct()
     {
-        $this->middleware('frontAuthCheck')->except('ecpayPaymentCheckoutResponse' , 'generateLogisticsOrder');
+        $this->middleware('frontAuthCheck')->except('ecpayPaymentCheckoutResponse' , 'generateEcpayLogisticsOrder' , 'ecpayLogisticsResponse' , 'test');
     }
 
     // 取得要結帳的資料
@@ -89,10 +95,11 @@ class CheckoutApi extends Controller
     {
         $totalPrice = $request->totalPrice;
         $checkoutProducts = $request->checkoutProducts;
+        $receiveAddressId = $request->receiveAddressId;
         $payMedhod = $request->payMedhod;   // 付款方式 
 
         // 訂單寫入資料庫
-        $orderNumber = $this->insertOrder($userId , $totalPrice);
+        $orderNumber = $this->insertOrder($userId , $totalPrice , $receiveAddressId);
         // 訂單細項寫入資料庫
         $this->insertOrderDetail($userId , $orderNumber , $checkoutProducts);
         // 付款
@@ -100,7 +107,7 @@ class CheckoutApi extends Controller
     }
 
     // 訂單寫入資料庫
-    public function insertOrder($userId , $totalPrice)
+    public function insertOrder($userId , $totalPrice , $receiveAddressId)
     {
         $orderNumber = time();
         $order['orderNumber'] = $orderNumber;
@@ -109,6 +116,13 @@ class CheckoutApi extends Controller
         $order['deliveryFee'] = 60;
         $order['amount'] = $totalPrice;
         $order['orderStatus'] = 1;
+
+        $receiveAddress = UserReceiveAddressModel::selete_user_receive_address_where_receiveAddressId_db($receiveAddressId);
+        $order['receiverName'] = $receiveAddress[0]->receiverName;
+        $order['receiverCellPhone'] = $receiveAddress[0]->receiverCellPhone;
+        $order['receiverStoreType'] = $receiveAddress[0]->receiverStoreType;
+        $order['receiverStoreName'] = $receiveAddress[0]->receiverStoreName;
+        $order['receiverStoreID'] = $receiveAddress[0]->receiverStoreID;
 
         $orderApi = new OrderApi();
         $orderApi->insert($order);
@@ -150,7 +164,7 @@ class CheckoutApi extends Controller
         }
 
         return $orderDetails;
-    }
+    }    
 
     // 有訂單結帳
     public function checkoutWithOrder($userId , $request)
@@ -229,6 +243,7 @@ class CheckoutApi extends Controller
             $orderApi = new OrderApi();
             $orderApi->update($orderNumber , $order);   // 更新付款狀態
             $this->generateInvoice($orderNumber);   // 付款成功開發票
+            $this->generateEcpayLogisticsOrder($orderNumber);   // 付款成功建立物流訂單
         }
 
         return '1|OK';
@@ -252,7 +267,7 @@ class CheckoutApi extends Controller
         if($invoiceData['Data']['RtnCode'] == 1){
             $this->updateOrderInvoice($orderNumber);
         }
-    }
+    }    
 
     // 組合開立綠界發票陣列
     public function setOrderProductArray($orderDetailProducts)
@@ -293,6 +308,30 @@ class CheckoutApi extends Controller
         $orderApi->update($orderNumber , $order);
     }
 
+    // 建立綠界物流訂單
+    public function generateEcpayLogisticsOrder($orderNumber)
+    {
+        $order = OrderModel::select_order_where_orderNumber_db($orderNumber);
+        $receiverStoreType = $order[0]->receiverStoreType;
+        $amount = $order[0]->amount;
+        $receiverName = $order[0]->receiverName;
+        $receiverCellPhone = $order[0]->receiverCellPhone;
+        $receiverStoreID = $order[0]->receiverStoreID;
+        
+        // 一段標測試 RtnCode = 1 代表測試成功 開始建立綠界物訂單
+        $testData = LogisticsTrait::createTestData($receiverStoreType);
+        if($testData['Data']['RtnCode'] == 1){
+
+            // 建立綠界物流訂單
+            $logisticsResponse = LogisticsTrait::create($orderNumber , $receiverStoreType , $amount , $receiverName , $receiverCellPhone , $receiverStoreID);
+            $orderLogisticsData['ecpayLogisticsStatus'] = $logisticsResponse['RtnCode'];
+            $orderLogisticsData['allPayLogisticsID'] = $logisticsResponse['1|AllPayLogisticsID'];
+
+            $orderApi = new OrderApi();
+            $orderApi->update($orderNumber , $orderLogisticsData);
+        }
+    }
+
     // 刪除已成立訂單的購物車商品
     public function deleteCartProduct($userId , $orderNumber)
     {
@@ -302,16 +341,6 @@ class CheckoutApi extends Controller
         {
             $CartApi->deleteCartProduct($userId , $checkoutProduct->productDetailId);
         }        
-    }
-
-    // 綠界物流
-    public function generateLogisticsOrder(Request $request)
-    {
-        $testData = LogisticsTrait::createTestData();
-        $clientReplyUrl = 123;
-        if($testData['Data']['RtnCode'] == 1){
-            LogisticsTrait::redirectToLogisticsSelection($clientReplyUrl);
-        }
     }
 
     // 取得使用者目前預設物流
@@ -331,4 +360,32 @@ class CheckoutApi extends Controller
             return response()->json(['receiverDefaultAddress' => null], Response::HTTP_OK);  
         }
     }
+
+    
+
+    // // 綠界物流地址選擇結果回傳
+    // public function ecpayLogisticsResponse(Request $request , $orderNumber)
+    // {
+    //     // 綠界回傳格式為json格式字串 所以先做 json_decode轉陣列
+    //     $logisticsResponse = json_decode($request['ResultData'],true);
+
+    //     // 裡面這一串資料有做aes加密 所以要在aes解密 並json_decode轉成陣列
+    //     $logisticsData = EcpayEncryptDecryptTrait::ecpayAesDecrypt($logisticsResponse['Data']);
+    //     $logisticsData = json_decode($logisticsData , true);
+
+    //     // return $logisticsData;
+
+    //     // RtnCode == 1 代表選擇成功 寫入資料庫
+    //     if($logisticsData['RtnCode'] == 1){
+
+    //         $order['tempLogisticsID'] = $logisticsData['tempLogisticsID'];
+    //         $order['receiverName'] = $logisticsData['ReceiverName'];
+    //         $order['receiverCellPhone'] = $logisticsData['ReceiverCellPhone'];
+    //         $order['receiverStoreType'] = $logisticsData['LogisticsSubType'];
+    //         $order['receiverStoreName'] = $logisticsData['ReceiverStoreName'];
+
+    //         $OrderApi = new OrderApi();
+    //         $OrderApi->update($orderNumber , $order);
+    //     }
+    // }
 }
