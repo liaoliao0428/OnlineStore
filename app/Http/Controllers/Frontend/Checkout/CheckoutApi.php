@@ -21,15 +21,10 @@ use App\Models\ProductDetailModel;
 
 use App\Models\UserReceiveAddressModel;
 
-use App\Http\Traits\ToolTrait;
+use App\Http\Traits\LinepayTrait;
 use App\Http\Traits\Ecpay\PaymentTrait;
 use App\Http\Traits\Ecpay\InvoiceTrait;
 use App\Http\Traits\Ecpay\LogisticsTrait;
-use App\Http\Traits\Ecpay\EcpayEncryptDecryptTrait;
-
-
-use Ecpay\Sdk\Factories\Factory;
-
 
 use App\Http\Controllers\Controller;
 
@@ -37,7 +32,7 @@ class CheckoutApi extends Controller
 {
     public function __construct()
     {
-        $this->middleware('frontAuthCheck')->except('ecpayPaymentCheckoutResponse' , 'generateEcpayLogisticsOrder' , 'ecpayLogisticsResponse' , 'test');
+        $this->middleware('frontAuthCheck')->except('ecpayPaymentCheckoutResponse' , 'ecpayLogisticsResponse' , 'linepay' , 'linepayConfirm');
     }
 
     // 取得要結帳的資料
@@ -73,6 +68,24 @@ class CheckoutApi extends Controller
         return $checkoutProducts;
     }
 
+    // 取得使用者目前預設物流
+    public function getReceiverDefaultAddress(Request $request)
+    {
+        $userId = $request->userId;
+
+        $receiverDefaultAddress = UserReceiveAddressModel::select_user_receive_address_default_db($userId);
+
+        // 判斷物流類型
+        $userReceiveAddressApi = new UserReceiveAddressApi();
+        $userReceiveAddressApi->setreceiverStoreType($receiverDefaultAddress);
+
+        if(!empty($receiverDefaultAddress)){
+            return response()->json(['receiverDefaultAddress' => $receiverDefaultAddress[0]], Response::HTTP_OK);  
+        }else{
+            return response()->json(['receiverDefaultAddress' => null], Response::HTTP_OK);  
+        }
+    }
+
     // 結帳
     public function checkout(Request $request)
     {
@@ -81,11 +94,11 @@ class CheckoutApi extends Controller
         
         switch($checkoutType){
             case 1:
-                $this->checkoutNoOrder($userId , $request);
+                return $this->checkoutNoOrder($userId , $request);
             break;
 
             case 2:
-                $this->checkoutWithOrder($userId , $request);
+                return $this->checkoutWithOrder($userId , $request);
             break;
         }
     }
@@ -103,7 +116,7 @@ class CheckoutApi extends Controller
         // 訂單細項寫入資料庫
         $this->insertOrderDetail($userId , $orderNumber , $checkoutProducts);
         // 付款
-        $this->pay($userId , $payMedhod , $orderNumber);             
+        return $this->pay($userId , $payMedhod , $orderNumber);             
     }
 
     // 訂單寫入資料庫
@@ -179,33 +192,49 @@ class CheckoutApi extends Controller
     // 付款
     public function pay($userId , $payMedhod , $orderNumber)
     {
-        $clientBackUrl = 'http://localhost:3000/user/order';
+        // 刪除已成立訂單的購物車商品
+        // $this->deleteCartProduct($userId , $orderNumber);
 
         // 付款 1->綠界信用卡、2->linepay
         switch ($payMedhod){
             case 1:
-                $this->ecpayPayment($orderNumber , $clientBackUrl);
+                return $this->ecpayPayment($orderNumber);
             break;
 
             case 2:
-                $this->linepay($orderNumber , $clientBackUrl);
+                return $this->linepay($orderNumber);
             break;
         }
-        
-        // 刪除已成立訂單的購物車商品
-        // $this->deleteCartProduct($userId , $orderNumber);
     }
 
-    // 綠界結帳
-    public function ecpayPayment($orderNumber , $clientBackUrl)
+    // 刪除已成立訂單的購物車商品
+    public function deleteCartProduct($userId , $orderNumber)
     {
+        $CartApi = new CartApi();
+        $checkoutProducts = OrderDetailModel::select_order_detail_db($orderNumber);
+        foreach($checkoutProducts as $checkoutProduct)
+        {
+            $CartApi->deleteCartProduct($userId , $checkoutProduct->productDetailId);
+        }        
+    } 
+
+    // 綠界結帳
+    public function ecpayPayment($orderNumber)
+    {
+        $clientBackUrl = 'http://localhost:3000/user/order';
+
         $checkoutProducts = OrderDetailModel::select_order_detail_db($orderNumber);
         $order = OrderModel::select_order_where_orderNumber_db($orderNumber);
 
         // 組合綠界結帳需要商品字串
         $itemName = $this->setItemName($checkoutProducts);
 
-        PaymentTrait::aioCheckOut($orderNumber , $order[0]->amount , $itemName ,  $clientBackUrl);
+        $ecpayPaymentHtml = PaymentTrait::aioCheckOut($orderNumber , $order[0]->amount , $itemName ,  $clientBackUrl);
+
+        return [
+            'payType' => 1,
+            'ecpayPaymentHtml' => $ecpayPaymentHtml
+        ];
     }
 
     // 組合綠界結帳需要商品字串
@@ -224,30 +253,58 @@ class CheckoutApi extends Controller
         return $itemName;
     }
 
-    // linepay結帳
-    public function linepay($orderNumber , $clientBackUrl)
-    {
-
-    }
-
     // 綠界結帳結果回傳
     public function ecpayPaymentCheckoutResponse(Request $request)
     {
         $orderNumber = $request->MerchantTradeNo;
         $RtnCode = $request->RtnCode;
-        $order['payMethod'] = $request->PaymentType;
-        $order['payTime'] = $request->PaymentDate;        
 
         // $RtnCode == 1 代表付款成功 更新復付款狀態以及時間
         if($RtnCode == 1){
-            $orderApi = new OrderApi();
-            $orderApi->update($orderNumber , $order);   // 更新付款狀態
-            $this->generateInvoice($orderNumber);   // 付款成功開發票
-            $this->generateEcpayLogisticsOrder($orderNumber);   // 付款成功建立物流訂單
+            $order['payStatus'] = 1;
+            $order['payMethod'] = $request->PaymentType;
+            $order['payTime'] = $request->PaymentDate;
+
+            // 結帳成功開發票、建立物流訂單
+            $this->paySuccess($orderNumber , $order);
         }
 
         return '1|OK';
+    }  
+    
+    // linepay結帳
+    public function linepay($orderNumber)
+    {       
+        return LinepayTrait::checkout($orderNumber);
+    }  
+
+    // linepay 付款確認 要打到這支api 確認完付款後交易紀錄才會進到linepay後台
+    public function linepayConfirm(Request $request , $orderNumber , $amount)
+    { 
+        $transactionId = $request->transactionId;
+
+        $confirmResponse = LinepayTrait::confirm($transactionId , $amount);
+
+        if($confirmResponse){
+            $order['payStatus'] = 1;
+            $order['payMethod'] = 'Linepay';
+            $order['payTime'] = date('Y-m-d H:i:s');
+
+            // 結帳成功開發票、建立物流訂單
+            $this->paySuccess($orderNumber , $order);
+
+            return redirect('http://localhost:3000/user/order');
+        }
     }    
+
+    // 結帳成功開發票跟建立物流訂單
+    public function paySuccess($orderNumber , $order)
+    {
+        $orderApi = new OrderApi();
+        $orderApi->update($orderNumber , $order);   // 更新付款狀態
+        $this->generateInvoice($orderNumber);   // 付款成功開發票
+        $this->generateEcpayLogisticsOrder($orderNumber);   // 付款成功建立物流訂單
+    }
 
     // 開立綠界發票
     public function generateInvoice($orderNumber)
@@ -332,60 +389,15 @@ class CheckoutApi extends Controller
         }
     }
 
-    // 刪除已成立訂單的購物車商品
-    public function deleteCartProduct($userId , $orderNumber)
+    // 綠界物流狀態回傳
+    public function ecpayLogisticsResponse(Request $request)
     {
-        $CartApi = new CartApi();
-        $checkoutProducts = OrderDetailModel::select_order_detail_db($orderNumber);
-        foreach($checkoutProducts as $checkoutProduct)
-        {
-            $CartApi->deleteCartProduct($userId , $checkoutProduct->productDetailId);
-        }        
-    }
+        $orderNumber = $request->MerchantTradeNo;
+        $orderLogisticsData['ecpayLogisticsStatus'] = $request->RtnCode;
 
-    // 取得使用者目前預設物流
-    public function getReceiverDefaultAddress(Request $request)
-    {
-        $userId = $request->userId;
+        $orderApi = new OrderApi();
+        $orderApi->update($orderNumber , $orderLogisticsData);
 
-        $receiverDefaultAddress = UserReceiveAddressModel::select_user_receive_address_default_db($userId);
-
-        // 判斷物流類型
-        $userReceiveAddressApi = new UserReceiveAddressApi();
-        $userReceiveAddressApi->setreceiverStoreType($receiverDefaultAddress);
-
-        if(!empty($receiverDefaultAddress)){
-            return response()->json(['receiverDefaultAddress' => $receiverDefaultAddress[0]], Response::HTTP_OK);  
-        }else{
-            return response()->json(['receiverDefaultAddress' => null], Response::HTTP_OK);  
-        }
-    }
-
-    
-
-    // // 綠界物流地址選擇結果回傳
-    // public function ecpayLogisticsResponse(Request $request , $orderNumber)
-    // {
-    //     // 綠界回傳格式為json格式字串 所以先做 json_decode轉陣列
-    //     $logisticsResponse = json_decode($request['ResultData'],true);
-
-    //     // 裡面這一串資料有做aes加密 所以要在aes解密 並json_decode轉成陣列
-    //     $logisticsData = EcpayEncryptDecryptTrait::ecpayAesDecrypt($logisticsResponse['Data']);
-    //     $logisticsData = json_decode($logisticsData , true);
-
-    //     // return $logisticsData;
-
-    //     // RtnCode == 1 代表選擇成功 寫入資料庫
-    //     if($logisticsData['RtnCode'] == 1){
-
-    //         $order['tempLogisticsID'] = $logisticsData['tempLogisticsID'];
-    //         $order['receiverName'] = $logisticsData['ReceiverName'];
-    //         $order['receiverCellPhone'] = $logisticsData['ReceiverCellPhone'];
-    //         $order['receiverStoreType'] = $logisticsData['LogisticsSubType'];
-    //         $order['receiverStoreName'] = $logisticsData['ReceiverStoreName'];
-
-    //         $OrderApi = new OrderApi();
-    //         $OrderApi->update($orderNumber , $order);
-    //     }
-    // }
+        return '1|OK';
+    }          
 }
