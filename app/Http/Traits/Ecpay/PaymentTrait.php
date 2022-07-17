@@ -22,14 +22,14 @@ trait PaymentTrait
         ]);
         $autoSubmitFormService = $factory->create('AutoSubmitFormWithCmvService');
 
-        echo $autoSubmitFormService->generate($input, $action);
+        return $autoSubmitFormService->generate($input, $action);
     }
 
     // 建立訂單
     public static function aioCheckOut($orderNumber , $totalPrice , $itemName ,  $clientBackUrl)
     {
         // $returnUrl = 'http://192.168.1.106/OnlineStore/Backend/public/api/checkout/ecpayPaymentCheckoutResponse'; // 訂單付款狀態response
-        $returnUrl = env('ECPAY_RETURN_URL_DOMAIN') . '/OnlineStore/Backend/public/api/frontend/checkout/ecpayPaymentCheckoutResponse'; // 訂單付款狀態response 現在使用ngrok 之後上線改正式
+        $returnUrl = env('NGROK_TEST_DOMAIN') . '/OnlineStore/Backend/public/api/frontend/checkout/ecpayPaymentCheckoutResponse'; // 訂單付款狀態response 現在使用ngrok 之後上線改正式
 
         $input = [
             'MerchantID' => PaymentTrait::$MerchantID,
@@ -46,6 +46,6 @@ trait PaymentTrait
         ];
         $action = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5';
 
-        PaymentTrait::ecpayPayment( $input , $action );
+        return PaymentTrait::ecpayPayment( $input , $action );
     }
 }

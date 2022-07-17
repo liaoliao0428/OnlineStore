@@ -100,7 +100,7 @@ class UserReceiveAddressApi extends Controller
         $userId = $request->userId;
         $userIdBase64Encode = base64_encode($userId);
         
-        $clientReplyUrl = env('ECPAY_RETURN_URL_DOMAIN') . '/OnlineStore/Backend/public/api/frontend/userReceiveAddress/ecpayLogisticsSelectionResponse/' . $userIdBase64Encode;
+        $clientReplyUrl = env('NGROK_TEST_DOMAIN') . '/OnlineStore/Backend/public/api/frontend/userReceiveAddress/ecpayLogisticsSelectionResponse/' . $userIdBase64Encode;
         
         LogisticsTrait::redirectToLogisticsSelection($clientReplyUrl);
     }

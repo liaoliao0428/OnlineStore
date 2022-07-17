@@ -92,68 +92,6 @@ trait LogisticsTrait
         echo $response['body'];
     }
 
-    // 更新暫時存物流訂單
-    public static function updateTempTrade()
-    {
-        $data = [
-            'TempLogisticsID' => 2000140,
-            'SenderName' => '王小美',
-        ];
-        $input = [
-            'MerchantID' => '2000132',
-            'RqHeader' => [
-                'Timestamp' => time(),
-                'Revision' => '1.0.0',
-            ],
-            'Data' => $data,
-        ];
-        $url = 'https://logistics-stage.ecpay.com.tw/Express/v2/UpdateTempTrade';
-
-        $response = LogisticsTrait::ecpayLogistics( $input , $url );
-        return $response;
-    }
-
-    // 建立正式物流訂單
-    public static function createByTempTrade()
-    {
-        $data = [
-            'TempLogisticsID' => '2264',
-        ];
-        $input = [
-            'MerchantID' => '2000132',
-            'RqHeader' => [
-                'Timestamp' => time(),
-                'Revision' => '1.0.0',
-            ],
-            'Data' => $data,
-        ];
-        $url = 'https://logistics-stage.ecpay.com.tw/Express/v2/CreateByTempTrade';
-
-        $response = LogisticsTrait::ecpayLogistics( $input , $url );
-        return $response;
-    }
-
-    // 查詢訂單
-    public function queryLogisticsTradeInfo()
-    {
-        $data = [
-            'MerchantID' => '2000132',
-            'LogisticsID' => '1769853',
-        ];
-        $input = [
-            'MerchantID' => '2000132',
-            'RqHeader' => [
-                'Timestamp' => time(),
-                'Revision' => '1.0.0',
-            ],
-            'Data' => $data,
-        ];
-        $url = 'https://logistics-stage.ecpay.com.tw/Express/v2/QueryLogisticsTradeInfo';
-
-        $response = LogisticsTrait::ecpayLogistics( $input , $url );
-        return $response;
-    }
-
     // 建立綠界物流訂單
     public static function create($orderNumber , $receiverStoreType , $amount , $receiverName , $receiverCellPhone , $receiverStoreID)
     {
@@ -165,7 +103,7 @@ trait LogisticsTrait
         $postService = $factory->create('PostWithCmvEncodedStrResponseService');
     
         $input = [
-            'MerchantID' => '2000132',
+            'MerchantID' => LogisticsTrait::$MerchantID,
             'MerchantTradeNo' => $orderNumber,
             'MerchantTradeDate' => date('Y/m/d H:i:s'),
             'LogisticsType' => 'CVS',
@@ -178,7 +116,7 @@ trait LogisticsTrait
             'ReceiverCellPhone' => $receiverCellPhone,
     
             // 請參考 example/Logistics/Domestic/GetLogisticStatueResponse.php 範例開發
-            'ServerReplyURL' => 'https://www.ecpay.com.tw/example/server-reply',
+            'ServerReplyURL' => env('NGROK_TEST_DOMAIN') . '/OnlineStore/Backend/public/api/frontend/checkout/ecpayLogisticsResponse',
     
             // 請參考 example/Logistics/Domestic/GetMapResponse.php 範例取得
             'ReceiverStoreID' => $receiverStoreID,

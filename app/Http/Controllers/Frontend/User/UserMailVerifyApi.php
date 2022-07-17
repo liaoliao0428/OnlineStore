@@ -43,7 +43,6 @@ class UserMailVerifyApi extends Controller
     // 寄信
     public function sendMail($mailContent)
     {
-        // $mail = '0451008@nkust.edu.tw';
         Mail::raw($mailContent ,function($message){
             $mail = $this->mail; // 使用物件寫法將信箱動態帶入
             $message->to($mail)->subject('xxxxStore註冊驗證信');
