@@ -194,6 +194,8 @@ Route::prefix('frontend')->group(function () {
         Route::post('/getReceiverDefaultAddress', [CheckoutApi::class, 'getReceiverDefaultAddress']);
         // 綠界結帳結果回傳
         Route::post('/ecpayPaymentCheckoutResponse', [CheckoutApi::class, 'ecpayPaymentCheckoutResponse']);
+        // linepay 付款確認
+        Route::get('/linepayConfirm/{orderNumber}/{amount}', [CheckoutApi::class, 'linepayConfirm']);
         // 綠界物流回傳
         Route::post('/ecpayLogisticsResponse', [CheckoutApi::class, 'ecpayLogisticsResponse']);
         
@@ -207,9 +209,9 @@ Route::prefix('frontend')->group(function () {
     // test 要測試的api
     Route::prefix('test')->group(function () {
         // linepay測試
-        Route::any('/linepay', [CheckoutApi::class, 'linepay']);
-         // linepay 確認測試
-         Route::any('/linepayConfirm/{orderNumber}/{amount}', [CheckoutApi::class, 'linepayConfirm']);
+        Route::post('/linepay', [CheckoutApi::class, 'linepay']);
+        // linepay 付款確認
+        Route::get('/linepayConfirm/{orderNumber}/{amount}', [CheckoutApi::class, 'linepayConfirm']);
 
     });
     

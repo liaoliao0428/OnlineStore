@@ -35,7 +35,7 @@ trait LinepayTrait
                 ],
             ],
             'redirectUrls' => [
-                'confirmUrl' => env('NGROK_TEST_DOMAIN') . '/OnlineStore/Backend/public/api/frontend/test/linepayConfirm/' . $orderNumber . '/' . $amount,
+                'confirmUrl' => env('NGROK_TEST_DOMAIN') . '/OnlineStore/Backend/public/api/frontend/checkout/linepayConfirm/' . $orderNumber . '/' . $amount,
                 'cancelUrl' => 'http://localhost:3000/user/order',
             ],
         ];
