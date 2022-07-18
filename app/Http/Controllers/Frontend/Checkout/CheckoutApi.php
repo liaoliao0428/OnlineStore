@@ -32,7 +32,7 @@ class CheckoutApi extends Controller
 {
     public function __construct()
     {
-        $this->middleware('frontAuthCheck')->except('ecpayPaymentCheckoutResponse' , 'ecpayLogisticsResponse' , 'linepay' , 'linepayConfirm');
+        $this->middleware('frontAuthCheck')->except('ecpayPaymentCheckoutResponse' , 'ecpayLogisticsResponse' , 'linepayConfirm');
     }
 
     // 取得要結帳的資料
@@ -153,6 +153,7 @@ class CheckoutApi extends Controller
         $OrderDetailApi->insert($orderDetails);
 
         // 並刪除庫存
+        $this->deleteProductDetailQuantity($orderNumber);
     }
 
     // 組合訂單細項陣列
@@ -177,7 +178,26 @@ class CheckoutApi extends Controller
         }
 
         return $orderDetails;
-    }    
+    }  
+    
+    // 刪除庫存
+    public function deleteProductDetailQuantity($orderNumber)
+    {
+        // 撈已經寫入訂單的商品
+        $orderDetails = OrderDetailModel::select_order_detail_db($orderNumber);
+        foreach($orderDetails as $orderDetail){
+            $productDetailId = $orderDetail->productDetailId;
+            $quantity = $orderDetail->quantity;
+
+            // 撈product_detail表的商品數量
+            $productDetail = ProductDetailModel::select_product_detail_with_productDetailId_db($productDetailId);
+            $productDetailQuantity = $productDetail[0]->quantity;
+            $newProductDetailQuantity['quantity'] = (int)$productDetailQuantity - (int)$quantity;
+
+            // 更新庫存
+            ProductDetailModel::update_product_detail_db($productDetailId,$newProductDetailQuantity);
+        }
+    }
 
     // 有訂單結帳
     public function checkoutWithOrder($userId , $request)
@@ -193,7 +213,7 @@ class CheckoutApi extends Controller
     public function pay($userId , $payMedhod , $orderNumber)
     {
         // 刪除已成立訂單的購物車商品
-        // $this->deleteCartProduct($userId , $orderNumber);
+        $this->deleteCartProduct($userId , $orderNumber);
 
         // 付款 1->綠界信用卡、2->linepay
         switch ($payMedhod){
