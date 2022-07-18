@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
@@ -20,36 +21,48 @@ class Order extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'orderId',
         'orderNumber',
-        'clientId',
-        'invoiceHeader',
+        'userId',
+        'orderStatus',
+        'deliveryFee',
+        'amount',
+        'payMethod',
+        'payTime',
         'invoiceNumber',
         'randomNumber',
         'invoiceDate',
-        'invoiceDateTaiwanType',
-        'invoiceTime',
         'taxType',
+        'taxAmount',
         'invoiceDonate',
         'carrierType',
         'carrierId',
-        'amount',
-        'cashIncome',
-        'cashChange',
-        'salesAmount',
-        'freeTaxSalesAmount',
-        'totalAmount',
-        'taxAmount',
-        'zeroTaxSalesAmount',
-        'payMethod',
-        'receiveName',
-        'receivePhone',
-        'receiveAddress',
-        'orderStatus'
+        'receiverName',
+        'receiverCellPhone',
+        'receiverStoreType',
+        'receiverStoreName',
+        'receiverStoreID',
+        'ecpayLogisticsStatus',
+        'allPayLogisticsID'
     ];
 }
 
 class OrderModel
 {
+    // 寫入
+    public static function insert_order_db($order)
+    {
+        Order::create($order);
+    }
+
+    // 更新
+    public static function update_order_db($orderNumber , $order)
+    {
+        Order::where('orderNumber',$orderNumber)->update($order);
+    }
     
+    // 抓訂單資料
+    public static function select_order_where_orderNumber_db($orderNumber)
+    {
+        return DB::select("SELECT * FROM `order` WHERE orderNumber = '$orderNumber'");
+    }
 }

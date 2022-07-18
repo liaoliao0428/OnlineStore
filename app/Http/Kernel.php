@@ -67,7 +67,7 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        // 'cros' => \App\Http\Middleware\EnableCrossRequestMiddleware::class,
+        'cros' => \App\Http\Middleware\EnableCrossRequestMiddleware::class,
         'authCheck' => \App\Http\Middleware\AuthCheck::class,  //帳戶驗證middleware
         'frontAuthCheck' => \App\Http\Middleware\FrontAuthCheck::class,  //前台帳戶驗證middleware
     ];

@@ -13,7 +13,7 @@ use App\Models\UserMailVerifyModel;
 use App\Http\Controllers\Frontend\User\UserMailVerifyApi;
 
 use App\Http\Traits\JwtTrait;
-
+use App\Http\Traits\ToolTrait;
 
 class UserApi extends Controller
 {   
@@ -47,7 +47,7 @@ class UserApi extends Controller
         $encryptionPassword = password_hash($password, PASSWORD_DEFAULT);
 
         // 如果驗證正確將註冊訊息寫入資料庫
-        $userId = $this->randomString(13);
+        $userId = ToolTrait::randomString(13);
         $user['userId'] = $userId;
         $user['userName'] = $userName;
         $user['mail'] = $mail;

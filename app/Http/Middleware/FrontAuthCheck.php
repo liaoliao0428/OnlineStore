@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-// use Illuminate\Http\Response;
+use Illuminate\Http\Response;
 use App\Http\Traits\JwtTrait;
 
 class FrontAuthCheck
@@ -27,7 +27,7 @@ class FrontAuthCheck
             $request->userId = $userId;
             return $next($request);
         }else{
-            return response()->json([false]);
+            return response()->json([false], Response::HTTP_OK);
         }
     }
 }

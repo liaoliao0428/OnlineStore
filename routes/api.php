@@ -23,13 +23,15 @@ use App\Http\Controllers\Frontend\Product\ProductApi;
 use App\Http\Controllers\Frontend\Category\CategoryApi;
 
 use App\Http\Controllers\Frontend\User\UserApi;
-
 use App\Http\Controllers\Frontend\User\UserMailVerifyApi;
+use App\Http\Controllers\Frontend\User\UserReceiveAddressApi;
 
 use App\Http\Controllers\Frontend\Cart\CartApi;
 
 use App\Http\Controllers\Frontend\Checkout\CheckoutApi;
 
+use App\Http\Controllers\Frontend\Order\OrderApi;
+use App\Http\Controllers\Frontend\Order\OrderDetailApi;
 /************************************ frontStage API Contorller************************************ */
 
 
@@ -144,6 +146,20 @@ Route::prefix('frontend')->group(function () {
         Route::post('/sendVerifyMail', [UserMailVerifyApi::class, 'sendVerifyMail']);
     });
 
+    // UserReceiveAddress
+    Route::prefix('userReceiveAddress')->group(function () {
+        // 綠界物流開啟地圖選擇寄送地址
+        Route::post('/', [UserReceiveAddressApi::class, 'userReceiveAddress']);
+        // 刪除地址
+        Route::delete('/delete', [UserReceiveAddressApi::class, 'delete']);
+        // 改變預設地址
+        Route::post('/changeDefaultReceiveAddress', [UserReceiveAddressApi::class, 'changeDefaultReceiveAddress']);
+        // 綠界物流開啟地圖選擇寄送地址
+        Route::post('/ecpayLogisticsSelection', [UserReceiveAddressApi::class, 'ecpayLogisticsSelection']);
+        // 綠界物流地址選擇結果回傳
+        Route::post('/ecpayLogisticsSelectionResponse/{userIdEncode}', [UserReceiveAddressApi::class, 'ecpayLogisticsSelectionResponse']);
+    });
+
     // Category
     Route::prefix('category')->group(function () {
         // 查詢字軌使用情況
@@ -168,10 +184,35 @@ Route::prefix('frontend')->group(function () {
         Route::delete('/delete', [CartApi::class, 'delete']);
     });
 
-     // Checkout
-     Route::prefix('checkout')->group(function () {
+    // Checkout
+    Route::prefix('checkout')->group(function () {
+        // 結帳
+        Route::post('/', [CheckoutApi::class, 'checkout']);
         // 取得要結帳的資料
         Route::post('/product', [CheckoutApi::class, 'checkoutProduct']);
+        // 取得使用者目前預設物流
+        Route::post('/getReceiverDefaultAddress', [CheckoutApi::class, 'getReceiverDefaultAddress']);
+        // 綠界結帳結果回傳
+        Route::post('/ecpayPaymentCheckoutResponse', [CheckoutApi::class, 'ecpayPaymentCheckoutResponse']);
+        // linepay 付款確認
+        Route::get('/linepayConfirm/{orderNumber}/{amount}', [CheckoutApi::class, 'linepayConfirm']);
+        // 綠界物流回傳
+        Route::post('/ecpayLogisticsResponse', [CheckoutApi::class, 'ecpayLogisticsResponse']);
+        
+    });
+
+    // Order
+    Route::prefix('order')->group(function () {
+
+    });
+
+    // test 要測試的api
+    Route::prefix('test')->group(function () {
+        // linepay測試
+        Route::post('/linepay', [CheckoutApi::class, 'linepay']);
+        // linepay 付款確認
+        Route::get('/linepayConfirm/{orderNumber}/{amount}', [CheckoutApi::class, 'linepayConfirm']);
+
     });
     
 });

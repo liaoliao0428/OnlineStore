@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class OrderDetail extends Model
 {
@@ -20,7 +21,7 @@ class OrderDetail extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'orderId',
+        'orderNumber',
         'productDetailId',
         'unitPrice',
         'quantity',
@@ -32,5 +33,17 @@ class OrderDetail extends Model
 
 class OrderDetailModel 
 {
-    
+    // 新增
+    public static function insert_order_detail_db($orderDetail)
+    {
+        OrderDetail::insert($orderDetail);
+    }
+
+    // 撈訂單細項商品細項id
+    public static function select_order_detail_db($orderNumber)
+    {
+        return DB::select("SELECT * 
+                           FROM order_detail 
+                           WHERE orderNumber = '$orderNumber'");
+    }   
 }

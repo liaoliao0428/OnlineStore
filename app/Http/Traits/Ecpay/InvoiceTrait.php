@@ -99,40 +99,23 @@ trait InvoiceTrait
     }
 
     // 開立發票
-    public function Issue()
+    public static function Issue($orderNumber , $salesAmount , $orderProductAarray)
     {
         $data = [
             "MerchantID" => InvoiceTrait::$MerchantID,
-            "RelateNumber" => "20181028000000001",
+            "RelateNumber" => $orderNumber,
             "CustomerID" => "",
             "CustomerIdentifier" => "",
-            "CustomerName" => "綠界科技股份有限公司",
-            "CustomerAddr" => "106 台北市南港區發票一街 1 號 1 樓",
-            "CustomerPhone" => "",
             "CustomerEmail" => "test@ecpay.com.tw",
-            "ClearanceMark" => "1",
-            "Print" => "1",
+            "Print" => "0",
             "Donation" => "0",
-            "LoveCode" => "",
             "CarrierType" => "",
             "CarrierNum" => "",
             "TaxType" => "1",
-            "SalesAmount" => 100,
-            "InvoiceRemark" => "發票備註",
+            "SalesAmount" => $salesAmount,
             "InvType" => "07",
             "vat" => "1",
-            "items" => [
-                [
-                    "ItemSeq" => 1,
-                    "ItemName" => "item02",
-                    "ItemCount" => 1,
-                    "ItemWord" => "個",
-                    "ItemPrice" => 20,
-                    "ItemTaxType" => "1",
-                    "ItemAmount" => 20,
-                    "ItemRemark" => "item02_desc"
-                ],
-            ],
+            "items" => $orderProductAarray
         ];
         $url = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/Issue';
         
@@ -141,12 +124,11 @@ trait InvoiceTrait
     }
 
     // 查詢發票明細
-    public function GetIssue()
+    public static function GetIssue($orderNumber)
     {
         $data = [
             "MerchantID" => InvoiceTrait::$MerchantID,
-            "InvoiceNo" => "AA123456",
-            "InvoiceDate" => "2018-10-28",
+            "RelateNumber" => $orderNumber,
         ];
         $url = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/GetIssue';
         
