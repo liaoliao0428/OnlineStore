@@ -63,7 +63,7 @@ Route::prefix('order')->group(function () {
     // 首頁
     Route::get('/index', [OrderController::class, 'index'])->name('orderIndex');
     // 詳情
-    Route::get('/detail', [OrderController::class, 'detail'])->name('orderDetail');
+    Route::get('/detail/{orderNumber}', [OrderController::class, 'detail'])->name('orderDetail');
 });
 
 // 發票

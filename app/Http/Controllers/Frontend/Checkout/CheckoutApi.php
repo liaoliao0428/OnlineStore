@@ -18,6 +18,7 @@ use App\Models\OrderDetailModel;
 
 use App\Models\ProductModel;
 use App\Models\ProductDetailModel;
+use App\Models\ProductImageModel;
 
 use App\Models\UserReceiveAddressModel;
 
@@ -40,9 +41,14 @@ class CheckoutApi extends Controller
     {
         $userId = $request->userId;
         $checkoutPorudctDetailIds = $request->checkoutPorudctDetailIds;
+        $checkoutType = $request->checkoutType; // 1的話代表無訂單、不然就是訂單編號
 
-        // 結帳商品陣列組合
-        $checkoutProducts = $this->setCheckoutProducts($userId , $checkoutPorudctDetailIds);
+        if($checkoutType == 1){
+            // 結帳商品陣列組合 無訂單 
+            $checkoutProducts = $this->setCartCheckoutProducts($userId , $checkoutPorudctDetailIds);
+        }else{
+            $checkoutProducts = $this->setOrderCheckoutProducts($checkoutType);
+        }        
 
         if(!empty($checkoutProducts)){
             return response()->json(['checkoutProducts' => $checkoutProducts], Response::HTTP_OK);  
@@ -51,8 +57,8 @@ class CheckoutApi extends Controller
         }
     }
 
-    // 結帳商品陣列組合
-    public function setCheckoutProducts($userId , $checkoutPorudctDetailIds)
+    // 結帳商品陣列組合 無訂單 抓購物車
+    public function setCartCheckoutProducts($userId , $checkoutPorudctDetailIds)
     {
         $checkoutProducts = [];
 
@@ -67,6 +73,26 @@ class CheckoutApi extends Controller
 
         return $checkoutProducts;
     }
+
+    // 結帳商品陣列組合 有訂單 抓訂單
+    public function setOrderCheckoutProducts($orderNumber)
+    {
+        $checkoutProducts = [];
+
+        $orderDetails = OrderDetailModel::select_order_detail_db($orderNumber);
+
+        foreach($orderDetails as $orderDetail){
+            $productDetailId = $orderDetail->productDetailId;
+            $productDetail = ProductDetailModel::select_product_detail_with_productDetailId_db($productDetailId);
+            $productId = $productDetail[0]->productId;
+            $productImage = ProductImageModel::select_product_image_with_productId_one_db($productId);
+            $orderDetail->image = $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . "/OnlineStore/Backend/storage/app/public/productImage/" . $productId . '/' . $productImage[0]->image;
+            $checkoutProducts[] = $orderDetail;
+        }
+
+        return $checkoutProducts;
+    }
+
 
     // 取得使用者目前預設物流
     public function getReceiverDefaultAddress(Request $request)
@@ -106,6 +132,7 @@ class CheckoutApi extends Controller
     // 無訂單結帳 先建立訂單在跑結帳
     public function checkoutNoOrder($userId , $request)
     {
+        $checkoutType = 1;
         $totalPrice = $request->totalPrice;
         $checkoutProducts = $request->checkoutProducts;
         $receiveAddressId = $request->receiveAddressId;
@@ -116,7 +143,7 @@ class CheckoutApi extends Controller
         // 訂單細項寫入資料庫
         $this->insertOrderDetail($userId , $orderNumber , $checkoutProducts);
         // 付款
-        return $this->pay($userId , $payMedhod , $orderNumber);             
+        return $this->pay($checkoutType , $userId , $payMedhod , $orderNumber);             
     }
 
     // 訂單寫入資料庫
@@ -171,6 +198,11 @@ class CheckoutApi extends Controller
             // 購物車陣列資料處理 並塞入要寫入訂單細項的資料中
             $carts = $CartApi->setCartArray($carts);
             $orderDetail['productDetailId'] = $carts[0]->productDetailId;
+
+            $orderDetail['categoryName'] = $carts[0]->categoryName;
+            $orderDetail['productName'] = $carts[0]->productName;
+            $orderDetail['specification'] = $carts[0]->specification;
+
             $orderDetail['unitPrice'] = (int)$carts[0]->unitPrice;
             $orderDetail['quantity'] = (int)$carts[0]->quantity;
             $orderDetail['amount'] = (int)$carts[0]->unitPrice * (int)$carts[0]->quantity;
@@ -202,18 +234,21 @@ class CheckoutApi extends Controller
     // 有訂單結帳
     public function checkoutWithOrder($userId , $request)
     {
+        $checkoutType = 2;
         $orderNumber = $request->orderNumber;
         $payMedhod = $request->payMedhod;   // 付款方式 
 
         // 付款
-        $this->pay($userId , $payMedhod , $orderNumber); 
+        return $this->pay($checkoutType , $userId , $payMedhod , $orderNumber); 
     }
 
     // 付款
-    public function pay($userId , $payMedhod , $orderNumber)
+    public function pay($checkoutType , $userId , $payMedhod , $orderNumber)
     {
-        // 刪除已成立訂單的購物車商品
-        $this->deleteCartProduct($userId , $orderNumber);
+        if($checkoutType == 1){
+            // 刪除已成立訂單的購物車商品
+            $this->deleteCartProduct($userId , $orderNumber);
+        }        
 
         // 付款 1->綠界信用卡、2->linepay
         switch ($payMedhod){

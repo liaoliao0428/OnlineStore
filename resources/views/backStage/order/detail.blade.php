@@ -25,86 +25,65 @@
             <div class="card-body row">
                 <div class="col-6 border-end px-4">
                     <div id="" class="col-12 row">
-                        <p>訂單編號 : <input type="text" id="" value="" disabled></p>
+                        <p>訂單編號 : <input type="text" id="orderNumber" value="" disabled></p>
                     </div>
                     <div id="date" class="col-12">
-                        <p>訂單日期 : <input type="text" id="" value="" disabled></p>
+                        <p>訂單日期 : <input type="text" id="createTime" value="" disabled></p>
                     </div>
                     <div id="" class="col-12">
-                        <p>收件人 : <input type="text" id="" value="" style="margin-left: 14px;"></p>
+                        <p>收件人 : <input type="text" id="receiverName" value="" style="margin-left: 14px;" disabled></p>
                     </div>
                     <div id="date" class="col-12">
-                        <p>收件電話 : <input type="text" id="" value=""></p>
+                        <p>收件電話 : <input type="text" id="receiverCellPhone" value="" disabled></p>
                     </div>
                     <div id="" class="col-12">
-                        <p>收件地址 : <input type="text" id="" value=""></p>
+                        <p>收件地址 : <input type="text" id="receiverAddress" value="" disabled></p>
                     </div>
                     <div id="" class="col-12" >
-                        <p>物流 :
-                            <select type="text" id="" value="" style="margin-left: 28px;">
-                                <option value="">自取</option>
-                                <option value="">超商取貨</option>
-                                <option value="">黑貓</option>
-                            </select>
-                        </p>
+                        <p>寄件物流 : <input type="text" id="receiverStoreType" value="" disabled></p>
                     </div>
                     <div id="" class="col-12">
-                        <p>寄送運費 : <input type="number" id="" value=""></p>
+                        <p>寄送運費 : <input type="text" id="deliveryFee" value="" disabled></p>
                     </div>
-                    <div id="" class="col-12">
+                    <!-- <div id="" class="col-12">
                         <p>訂單備註 : </p>
                         <textarea type="text" id="" value="" style="width: 48%;"></textarea>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="col-6 px-4">
                     <div id="" class="col-12">
-                        <p>訂單金額 : <input type="number" id="" value=""></p>
+                        <p>訂單金額 : <input type="text" id="amount" value="" disabled></p>
                     </div>
                     <div id="" class="col-12">
-                        <p>付款方式 :
-                            <select type="text" id="" value="">
-                                <option value="">綠界信用卡</option>
-                            </select>
-                        </p>
+                        <p>付款方式 : <input type="text" id="payMethod" value="" disabled></p>
                     </div>
                     <div id="" class="col-12">
-                        <p>付款狀態 :
-                            <select type="text" id="" value="">
-                                <option value="">綠界信用卡</option>
-                            </select>
-                        </p>
+                        <p>付款狀態 : <input type="text" id="payStatus" value="" disabled></p>
                     </div>
                     <div id="" class="col-12">
-                        <p>發票號碼 : <input type="text" id="" value="" disabled></p>
+                        <p>付款時間 : <input type="text" id="payTime" value="" disabled></p>
                     </div>
                     <div id="" class="col-12">
-                        <p>發票統編 : <input type="text" id="" value=""></p>
+                        <p>發票號碼 : <input type="text" id="invoiceNumber" value="" disabled></p>
                     </div>
                     <div id="" class="col-12">
-                        <p>發票載具 : <input type="text" id="" value=""></p>
+                        <p>發票統編 : <input type="text" id="" value="" disabled></p>
                     </div>
                     <div id="" class="col-12">
-                        <p>發票捐贈 :
-                            <select type="text" id="" value="">
-                                <option value="">不捐贈</option>
-                                <option value="">捐贈</option>
-                            </select>
-                        </p>
+                        <p>發票載具 : <input type="text" id="carrierId" value="" disabled></p>
                     </div>
                     <div id="" class="col-12">
-                        <p>訂單狀態 :
-                            <select type="text" id="" value="">
-                                <option value="">不捐贈</option>
-                                <option value="">捐贈</option>
-                            </select>
-                        </p>
+                        <p>發票捐贈 : <input type="text" id="invoiceDonate" value="" disabled></p>
                     </div>
-                    <div class="col-12">
+                    <div id="" class="col-12">
+                        <p>訂單狀態 : <input type="text" id="orderStatus" value="" disabled></p>
+                    </div>
+                    <div class="col-12" id="orderAction">
                         <div class="col-4">
-                            <button class="btn btn-outline-success" style="width: 100%;">訂單成立</button>
+                            <button class="btn btn-outline-success" style="width: 100%;" onclick="confirmOrder()">訂單成立</button>
                         </div>
                         <div class="col-4 mt-3">
-                            <button class="btn btn-outline-danger" style="width: 100%;">訂單取消</button>
+                            <button class="btn btn-outline-danger" style="width: 100%;" onclick="cancelOrder()">訂單取消</button>
                         </div>
                     </div>
                 </div>
@@ -131,16 +110,7 @@
                             </tr>
                         </thead>
                         <!-- 訂單內容 -->
-                        <tbody id="order" class="align-middle text-center">
-                            <tr>
-                                <td>牛逼</td>
-                                <td>笨蛋衣服</td>
-                                <td>X</td>
-                                <td>$100</td>
-                                <td>10</td>
-                                <td>$100000</td>
-                            </tr>
-                        </tbody>
+                        <tbody id="orderDetail" class="align-middle text-center"></tbody>
                     </table>
                 </div>
             </div>
@@ -154,6 +124,235 @@
 @section('script')
 
 <script>
+    // 從網址取得當前分類id
+    const getOrderNumber = () => {
+        let url = location.pathname
+        let splitUrl = url.split("/");
+        let splitUrlLength = splitUrl.length
+        let orderNumber = splitUrl[splitUrlLength - 1]
+        return orderNumber
+    }
+
+    // 取得訂單詳細資料
+    const getOrderFullData = async () => {
+        let orderNumber = getOrderNumber()
+        let response = await axios.post("{{route('orderFullData')}}",{
+            'orderNumber': orderNumber
+        })
+
+        insertOrderData(response.data.orderFullData.order)
+        insertOrderDetailData(response.data.orderFullData.orderDetail)
+        insertOrderAction(response.data.orderFullData.order.orderStatus)
+    }
+
+    // 塞訂單資料
+    const insertOrderData = (order) => {
+        let orderStatus = order.orderStatus
+        let receiverStoreType = order.receiverStoreType
+        let invoiceDonate = order.invoiceDonate
+        let payStatus = order.payStatus
+
+        // 因為有些東西不用把原本的狀態轉掉 所以訂單細項的某先狀態中文改在這邊判斷
+        let orderStatusName = ''
+        switch(orderStatus){
+                case 1:
+                    orderStatusName = '確認中';
+                break;
+
+                case 2:
+                    orderStatusName = '訂單成立處理中';
+                break;
+
+                case 3:
+                    orderStatusName = '已出貨';
+                break;
+
+                case 4: 
+                    orderStatusName = '已送達';
+                break;
+
+                case 5: 
+                    orderStatusName = '訂單完成';
+                break;
+
+                case 6: 
+                    orderStatusName = '訂單取消申請';
+                break;
+
+                case 7: 
+                    orderStatusName = '訂單退貨申請';
+                break;
+
+                case 8: 
+                    orderStatusName = '訂單取消';
+                break;
+
+                case 9: 
+                    orderStatusName = '訂單退貨';
+                break;
+        }
+
+        let receiverStoreTypeName = ''
+        switch(receiverStoreType){
+            case 'FAMI': case 'FAMIC2C':
+                receiverStoreTypeName = '全家';
+            break;
+
+            case 'UNIMART': case 'UNIMARTFREEZE': case 'UNIMARTC2C':
+                receiverStoreTypeName = '7-11';
+            break;
+
+            case 'HILIFE': case 'HILIFEC2C': case 'OKMARTC2C':
+                receiverStoreTypeName = '萊爾富';
+            break;
+
+            case 'OKMARTC2C': 
+                receiverStoreTypeName = 'OK';
+            break;
+        }
+
+        let invoiceDonateName = ''
+        switch(invoiceDonate){
+            case 0:
+                invoiceDonateName = '不捐贈';
+            break;
+
+            case 1:
+                invoiceDonateName = '捐贈';
+            break;
+        }
+
+        let payStatusName = ''
+        switch(payStatus){
+            case 0:
+                payStatusName = '未付款';
+            break;
+
+            case 1:
+                payStatusName = '已付款';
+            break;
+
+            case 2:
+                payStatusName = '已退款';
+            break;
+        }
+
+        $('#orderNumber').val(order.orderNumber)
+        $('#createTime').val(order.createTime)
+        $('#receiverName').val(order.receiverName)
+        $('#receiverCellPhone').val(order.receiverCellPhone)
+        $('#receiverAddress').val(order.orderNumber)
+        $('#receiverStoreType').val(receiverStoreTypeName)
+        $('#deliveryFee').val(order.deliveryFee)
+        $('#amount').val(order.amount)
+        $('#payMethod').val(order.payMethod)
+        $('#payStatus').val(payStatusName)
+        $('#payTime').val(order.payTime)
+        $('#invoiceNumber').val(order.invoiceNumber)
+        $('#carrierId').val(order.carrierId)
+        $('#invoiceDonate').val(invoiceDonateName)
+        $('#orderStatus').val(orderStatusName)
+    }
+
+    // 塞訂單細項資料
+    const insertOrderDetailData = (orderDetails) => {
+        let orderDetailHtml = setOrderDetailHtml(orderDetails)
+        $('tbody#orderDetail').html(orderDetailHtml)
+    }
+
+    // 組合orderDetailHtml
+    const setOrderDetailHtml = (orderDetails) => {
+        let orderDetailHtml = ``
+        orderDetails.forEach((orderDetail) => {
+            orderDetailHtml += `<tr>
+                                <td>${orderDetail.categoryName}</td>
+                                <td>${orderDetail.productName}</td>
+                                <td>${orderDetail.specification}</td>
+                                <td>$${orderDetail.unitPrice}</td>
+                                <td>${orderDetail.quantity}</td>
+                                <td>$${orderDetail.unitPrice * orderDetail.quantity}</td>
+                            </tr>`
+        })
+        
+        return orderDetailHtml
+    }
+
+    // 塞訂單執行動作button
+    const insertOrderAction = (orderStatus) => {
+        let orderActionHtml = ``
+        switch(orderStatus){
+            // 訂單狀態 1->確認中、2->訂單成立處理中、3->已出貨、4->已送達、5->訂單完成、6->訂單取消申請、7->訂單退貨申請、8->訂單取消、9->訂單退貨
+            // 所以只有訂單狀態 1、2、6會需要再action區塊塞按鈕
+            case 1:
+                orderActionHtml = `<div class="col-4">
+                                       <button class="btn btn-outline-success" style="width: 100%;" onclick="confirmOrder()">訂單成立</button>
+                                   </div>
+                                   <div class="col-4 mt-3">
+                                       <button class="btn btn-outline-danger" style="width: 100%;" onclick="cancelOrder()">訂單取消</button>
+                                   </div>` 
+            break;
+
+            case 2:
+                orderActionHtml = `<div class="col-4 mt-3">
+                                       <button class="btn btn-outline-danger" style="width: 100%;" onclick="cancelOrder()">訂單取消</button>
+                                   </div>`
+            break;
+
+            case 6:
+                orderActionHtml = `<div class="col-4 mt-3">
+                                       <button class="btn btn-outline-danger" style="width: 100%;" onclick="cancelOrder()">訂單取消/確認</button>
+                                   </div>`
+            break;
+
+            case 7:
+                orderActionHtml = `<div class="col-4 mt-3">
+                                       <button class="btn btn-outline-danger" style="width: 100%;" onclick="returnOrder()">訂單退貨/確認</button>
+                                   </div>`
+            break;
+        }
+
+        $('#orderAction').html(orderActionHtml)
+
+        
+    }
+
+    getOrderFullData()
+
+    // 訂單成立
+    const confirmOrder = async () => {
+        let orderNumber = getOrderNumber()
+        let response = await axios.patch("{{route('confirmOrder')}}",{
+            'orderNumber': orderNumber
+        })
+
+        if(response.data){
+            getOrderFullData()
+        }
+    }
+
+    // 訂單取消
+    const cancelOrder = async () => {
+        let orderNumber = getOrderNumber()
+        let response = await axios.patch("{{route('cancelOrder')}}",{
+            'orderNumber': orderNumber
+        })
+
+        if(response.data){
+            getOrderFullData()
+        }
+    }
+
+    // 取消訂單
+    const returnOrder = async () => {
+        let orderNumber = getOrderNumber()
+        let response = await axios.patch("{{route('returnOrder')}}",{
+            'orderNumber': orderNumber
+        })
+
+        if(response.data){
+            getOrderFullData()
+        }
+    }
 
 </script>
 

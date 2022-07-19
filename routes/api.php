@@ -122,6 +122,22 @@ Route::prefix('invoice')->group(function () {
 });
 /***************************************invoice************************************* */
 
+/***************************************order************************************* */
+// 訂單 order
+Route::prefix('order')->group(function () {
+    // 取得指定狀態訂單資料
+    Route::post('/', [OrderController::class, 'order'])->name('order');   
+    // 取得訂單詳細資料
+    Route::post('/fullData', [OrderController::class, 'orderFullData'])->name('orderFullData');
+    // 訂單成立
+    Route::patch('/confirmOrder', [OrderController::class, 'confirmOrder'])->name('confirmOrder');
+    // 取消訂單
+    Route::patch('/cancelOrder', [OrderController::class, 'cancelOrder'])->name('cancelOrder'); 
+    // 訂單退貨
+    Route::patch('/returnOrder', [OrderController::class, 'returnOrder'])->name('returnOrder');   
+});
+/***************************************order************************************* */
+
 
 Route::prefix('frontend')->group(function () {
     // User
@@ -203,15 +219,22 @@ Route::prefix('frontend')->group(function () {
 
     // Order
     Route::prefix('order')->group(function () {
-
+        // 撈指定會員所有訂單
+        Route::post('/', [OrderApi::class, 'order']);
+        // 取得已經建立訂單但是未結帳的訂單的productDetailId
+        Route::post('/getOrderDetailIdNotPay', [OrderApi::class, 'getOrderDetailIdNotPay']);
+        // 訂單完成
+        Route::patch('/finishOrder', [OrderApi::class, 'finishOrder']);
+        // 取消訂單申請
+        Route::patch('/cancelOrderApply', [OrderApi::class, 'cancelOrderApply']);
+        // 訂單退貨申請
+        Route::patch('/returnOrderApply', [OrderApi::class, 'returnOrderApply']);
     });
 
     // test 要測試的api
     Route::prefix('test')->group(function () {
-        // linepay測試
-        Route::post('/linepay', [CheckoutApi::class, 'linepay']);
-        // linepay 付款確認
-        Route::get('/linepayConfirm/{orderNumber}/{amount}', [CheckoutApi::class, 'linepayConfirm']);
+
+        // Route::post('/ecpayLogisticsResponse', [CheckoutApi::class, 'ecpayLogisticsResponse']);
 
     });
     

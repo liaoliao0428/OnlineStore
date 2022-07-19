@@ -137,7 +137,8 @@
     const getProductIdFromUrl = async () => {
         let url = location.pathname
         let splitUrl = url.split("/");
-        let productId = splitUrl[6]
+        let splitUrlLength = splitUrl.length
+        let productId = splitUrl[splitUrlLength - 1]
         return productId
     }
 

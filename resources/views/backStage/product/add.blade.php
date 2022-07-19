@@ -54,7 +54,8 @@
     const getCategoryIdFromUrl = async () => {
         let url = location.pathname
         let splitUrl = url.split("/");
-        let categoryId = splitUrl[6]
+        let splitUrlLength = splitUrl.length
+        let categoryId = splitUrl[splitUrlLength - 1]
         return categoryId
     } 
 
