@@ -11,6 +11,7 @@ use App\Models\CartModel;
 use App\Models\ProductModel;
 use App\Models\ProductDetailModel;
 use App\Models\ProductImageModel;
+use App\Models\CategoryModel;
 
 class CartApi extends Controller
 {
@@ -44,9 +45,12 @@ class CartApi extends Controller
             $productId = $productDetail[0]->productId;
             $product = ProductModel::select_product_with_productId_db($productId);
             $productImage = ProductImageModel::select_product_image_with_productId_one_db($productId);
+            $categoryId = $product[0]->categoryId;
+            $category = CategoryModel::select_category_where_categoryId_db($categoryId);
 
             $cart->unitPrice = (int)$productDetail[0]->unitPrice;
-            $cart->productName = $product[0]->productName . '-' . $productDetail[0]-> productDetailName;  
+            $cart->productName = $product[0]->productName . '-' . $productDetail[0]-> productDetailName;
+            $cart->categoryName = $category[0]->categoryName;
             $cart->specification = $productDetail[0]-> specification; 
             $cart->image = $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . "/OnlineStore/Backend/storage/app/public/productImage/" . $productId . '/' . $productImage[0]->image;
         }
