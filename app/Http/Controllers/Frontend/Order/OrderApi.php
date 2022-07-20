@@ -71,6 +71,7 @@ class OrderApi extends Controller
             break;
         }
 
+        // 訂單狀態名稱轉換
         $this->setOrderEveryStatusName($orders);
 
         // 回傳資料
@@ -78,6 +79,77 @@ class OrderApi extends Controller
             return response()->json(['order' => $orders], Response::HTTP_OK);
         }else{
             return response()->json(['order' => null], Response::HTTP_OK);
+        }
+    }    
+
+    // 取得已經建立訂單但是未結帳的訂單的productDetailId
+    public function getOrderDetailIdNotPay(Request $request)
+    {
+        $orderNumber = $request->orderNumber;
+
+        $orderDetails = OrderDetailModel::select_order_detail_db($orderNumber);
+
+        $productDetailIds = [];
+        foreach($orderDetails as $orderDetail){
+            $productDetailId = $orderDetail->productDetailId;
+            $productDetailIds[]['productDetailId'] = $productDetailId;
+        }
+
+        return response()->json(['productDetailId' => $productDetailIds], Response::HTTP_OK);
+    }
+
+    // 訂單完成
+    public function finishOrder(Request $request)
+    {
+        $orderNumber = $request->orderNumber;
+
+        $order['orderStatus'] = 5;
+        OrderModel::update_order_db($orderNumber , $order);      
+        
+        return response()->json([true], Response::HTTP_OK);
+    }
+
+    // 取消訂單申請
+    public function cancelOrderApply(Request $request)
+    {
+        $orderNumber = $request->orderNumber;
+
+        $order['orderStatus'] = 6;
+        OrderModel::update_order_db($orderNumber , $order);      
+        
+        return response()->json([true], Response::HTTP_OK);
+    }
+
+    // 訂單退貨申請
+    public function returnOrderApply(Request $request)
+    {
+        $orderNumber = $request->orderNumber;
+
+        $order['orderStatus'] = 7;
+        OrderModel::update_order_db($orderNumber , $order);      
+        
+        return response()->json([true], Response::HTTP_OK);
+    }
+
+    // 撈指定會員的訂單的全部資料
+    public function orderFullData(Request $request)
+    {
+        $userId = $request->userId;
+        $orderNumber = $request->orderNumber;
+
+        $order = OrderModel::select_order_where_orderNumber_db($orderNumber);
+        $orderDetail = OrderDetailModel::select_order_detail_db($orderNumber);
+
+        $this->setOrderEveryStatusName($order);
+
+        $orderFullData['order'] = $order[0];
+        $orderFullData['orderDetail'] = $orderDetail;
+
+        // 回傳資料
+        if(!empty($order)){
+            return response()->json(['orderFullData' => $orderFullData], Response::HTTP_OK);
+        }else{
+            return response()->json(['orderFullData' => null], Response::HTTP_OK);
         }
     }
 
@@ -159,56 +231,18 @@ class OrderApi extends Controller
                 break;
             }
 
+            $invoiceDonate = $order->invoiceDonate;
+            switch($invoiceDonate){
+                case 0:
+                    $order->invoiceDonateName = '不捐贈';
+                break;
+
+                case 1:
+                    $order->invoiceDonateName = '捐贈';
+                break;
+            }
+
         }
-    }
-
-    // 取得已經建立訂單但是未結帳的訂單的productDetailId
-    public function getOrderDetailIdNotPay(Request $request)
-    {
-        $orderNumber = $request->orderNumber;
-
-        $orderDetails = OrderDetailModel::select_order_detail_db($orderNumber);
-
-        $productDetailIds = [];
-        foreach($orderDetails as $orderDetail){
-            $productDetailId = $orderDetail->productDetailId;
-            $productDetailIds[]['productDetailId'] = $productDetailId;
-        }
-
-        return response()->json(['productDetailId' => $productDetailIds], Response::HTTP_OK);
-    }
-
-    // 訂單完成
-    public function finishOrder(Request $request)
-    {
-        $orderNumber = $request->orderNumber;
-
-        $order['orderStatus'] = 5;
-        OrderModel::update_order_db($orderNumber , $order);      
-        
-        return response()->json([true], Response::HTTP_OK);
-    }
-
-    // 取消訂單申請
-    public function cancelOrderApply(Request $request)
-    {
-        $orderNumber = $request->orderNumber;
-
-        $order['orderStatus'] = 6;
-        OrderModel::update_order_db($orderNumber , $order);      
-        
-        return response()->json([true], Response::HTTP_OK);
-    }
-
-    // 訂單退貨申請
-    public function returnOrderApply(Request $request)
-    {
-        $orderNumber = $request->orderNumber;
-
-        $order['orderStatus'] = 7;
-        OrderModel::update_order_db($orderNumber , $order);      
-        
-        return response()->json([true], Response::HTTP_OK);
     }
 
 }

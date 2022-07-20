@@ -241,7 +241,7 @@
         $('#createTime').val(order.createTime)
         $('#receiverName').val(order.receiverName)
         $('#receiverCellPhone').val(order.receiverCellPhone)
-        $('#receiverAddress').val(order.orderNumber)
+        $('#receiverAddress').val(receiverStoreTypeName + order.receiverStoreName)
         $('#receiverStoreType').val(receiverStoreTypeName)
         $('#deliveryFee').val(order.deliveryFee)
         $('#amount').val(order.amount)
