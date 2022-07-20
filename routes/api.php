@@ -229,12 +229,14 @@ Route::prefix('frontend')->group(function () {
         Route::patch('/cancelOrderApply', [OrderApi::class, 'cancelOrderApply']);
         // 訂單退貨申請
         Route::patch('/returnOrderApply', [OrderApi::class, 'returnOrderApply']);
+        // 撈指定會員的訂單的全部資料
+        Route::post('/orderFullData', [OrderApi::class, 'orderFullData']);
     });
 
     // test 要測試的api
     Route::prefix('test')->group(function () {
 
-        // Route::post('/ecpayLogisticsResponse', [CheckoutApi::class, 'ecpayLogisticsResponse']);
+        Route::any('/test', [CheckoutApi::class, 'test']);
 
     });
     
