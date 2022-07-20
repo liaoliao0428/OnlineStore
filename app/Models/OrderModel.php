@@ -59,10 +59,50 @@ class OrderModel
     {
         Order::where('orderNumber',$orderNumber)->update($order);
     }
+
+    // 抓指定會員全部訂單資料
+    public static function select_order_where_userId_db($userId)
+    {
+        return DB::select("SELECT * 
+                           FROM `order` 
+                           WHERE userId = '$userId' 
+                           ORDER BY createTime DESC");
+    }
+
+    // 抓指定會員指定付款狀態指定訂單狀態的訂單資料
+    public static function select_order_where_userId_payStatus_orderStatus_db($userId , $payStatus , $orderStatus)
+    {
+        return DB::select("SELECT * 
+                           FROM `order` 
+                           WHERE userId = '$userId' AND payStatus = $payStatus AND orderStatus = $orderStatus 
+                           ORDER BY createTime DESC");
+    }
+
+    // 抓指定會員狀態訂單資料
+    public static function select_order_where_userId_orderStatus_db($userId , $orderStatus)
+    {
+        return DB::select("SELECT * 
+                           FROM `order` 
+                           WHERE userId = '$userId' AND orderStatus = $orderStatus 
+                           ORDER BY createTime DESC");
+    }
+
+    // 抓指定狀態訂單資料
+    public static function select_order_where_orderStatus($orderStatus)
+    {
+        return DB::select("SELECT * 
+                           FROM `order` 
+                           WHERE orderStatus = $orderStatus 
+                           ORDER BY createTime DESC");
+    }
     
-    // 抓訂單資料
+    // 抓指定訂單編號訂單資料
     public static function select_order_where_orderNumber_db($orderNumber)
     {
-        return DB::select("SELECT * FROM `order` WHERE orderNumber = '$orderNumber'");
+        return DB::select("SELECT * 
+                           FROM `order` 
+                           WHERE orderNumber = '$orderNumber'");
     }
+
+    
 }

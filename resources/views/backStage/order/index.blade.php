@@ -21,37 +21,36 @@
     </div>
     <hr />
     <div class="col-12 row m-0 my-3">
-        <!-- 時間選擇 -->
-        <div class="col-3 d-flex align-items-center justify-content-start">
-            <input id="date" type="date">
-        </div>
-        <div class="col-9 d-flex p-0">
-            <div class="col-2">
-                <button id="button_1" class="btn btn-outline-success active" style="width: 90%;" onclick="changeButtonClass('button_1')">訂單成立</button>
+        <!-- 訂單狀態選擇 -->
+        <div class="col-12 d-flex p-0 justify-content-center">
+            <div class="col-1">
+                <button id="button_1" class="btn btn-outline-success active" style="width: 90%;" onclick="changeButtonClass('button_1')">新訂單</button>
             </div>
-            <div class="col-2">
+            <div class="col-1">
                 <button id="button_2" class="btn btn-outline-success" style="width: 90%;" onclick="changeButtonClass('button_2')">處理中</button>
             </div>
-            <div class="col-2">
+            <div class="col-1">
                 <button id="button_3" class="btn btn-outline-success" style="width: 90%;" onclick="changeButtonClass('button_3')">已出貨</button>
             </div>
-            <div class="col-2">
+            <div class="col-1">
                 <button id="button_4" class="btn btn-outline-success" style="width: 90%;" onclick="changeButtonClass('button_4')">已送達</button>
             </div>
-            <div class="col-2">
+            <div class="col-1">
                 <button id="button_5" class="btn btn-outline-success" style="width: 90%;" onclick="changeButtonClass('button_5')">訂單完成</button>
             </div>
             <div class="col-2">
-                <button id="button_6" class="btn btn-outline-success" style="width: 90%;" onclick="changeButtonClass('button_6')">訂單取消/退貨</button>
+                <button id="button_6" class="btn btn-outline-success" style="width: 90%;" onclick="changeButtonClass('button_6')">訂單取消/退貨申請</button>
+            </div>
+            <div class="col-2">
+                <button id="button_7" class="btn btn-outline-success" style="width: 90%;" onclick="changeButtonClass('button_7')">訂單取消/退貨</button>
             </div>
         </div>
     </div>
 
-
     <div class="card">
         <div class="card-body ">
             <!-- 訂單列表 -->
-            <table class="table table-bordered mb-0" id="product">
+            <table class="table table-bordered mb-0">
                 <!-- 外框欄位 -->
                 <thead>
                     <tr>
@@ -66,52 +65,11 @@
                     </tr>
                 </thead>
                 <!-- 訂單內容 -->
-                <tbody id="order" class="align-middle text-center">
-                    <tr>
-                        <th scope="row">111111111111</th>
-                        <td>2022-05-06 12:00:00</td>
-                        <td>$100000</td>
-                        <td>綠界金流</td>
-                        <td>未付款</td>
-                        <td>訂單成立</td>
-                        <td>7-11</td>
-                        <!-- 詳情按鈕 -->
-                        <td>
-                            <a href="{{route('orderDetail')}}" type="button" class="btn btn-outline-primary  mx-auto" ><i class='bx bx-edit mr-1'></i>詳情</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">111111111111</th>
-                        <td>2022-05-06 12:00:00</td>
-                        <td>$100000</td>
-                        <td>綠界金流</td>
-                        <td>未付款</td>
-                        <td>訂單成立</td>
-                        <td>7-11</td>
-                        <!-- 詳情按鈕 -->
-                        <td>
-                            <a href="{{route('orderDetail')}}" type="button" class="btn btn-outline-primary  mx-auto" ><i class='bx bx-edit mr-1'></i>詳情</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">111111111111</th>
-                        <td>2022-05-06 12:00:00</td>
-                        <td>$100000</td>
-                        <td>綠界金流</td>
-                        <td>未付款</td>
-                        <td>訂單成立</td>
-                        <td>7-11</td>
-                        <!-- 詳情按鈕 -->
-                        <td>
-                            <a href="{{route('orderDetail')}}" type="button" class="btn btn-outline-primary mx-auto" ><i class='bx bx-edit mr-1'></i>詳情</a>
-                        </td>
-                    </tr>
-                </tbody>
+                <tbody id="order" class="align-middle text-center"></tbody>
             </table>
         </div>
     </div>
 </div>
-
 
 @endsection
 @section('script')
@@ -126,10 +84,56 @@
 
     // 改變訂單狀態按鈕樣式
     const changeButtonClass = (button) => {
-        for(i = 1;i < 7;i++){
+        for(i = 1;i < 8;i++){
             $(`#button_${i}`).removeClass("active")
         }        
         $(`#${button}`).addClass("active")
+        getOrder(button)
     }
+
+    // 撈訂單資料
+    const getOrder = async (button) => {
+        let orderStatus = button.split('_')
+        let response = await axios.post("{{route('order')}}",{
+            'orderStatus': orderStatus[1]
+        })
+
+        let orderHtml = setOrderHtml(response.data.order)
+
+        $('tbody#order').html(orderHtml)
+    }
+
+    // 將訂單資料處合成html
+    const setOrderHtml = (orders) => {
+        let orderHtml = ''
+        orders.forEach((order) => {
+            orderHtml += `<tr>
+                              <th scope="row">${order.orderNumber}</th>
+                              <td>${order.createTime}</td>
+                              <td>$${order.amount}</td>
+                              <td>${order.payMethod}</td>
+                              <td>${order.payStatus}</td>
+                              <td>${order.orderStatus}</td>
+                              <td>${order.receiverStoreType}</td>
+                              <!-- 詳情按鈕 -->
+                              <td>
+                                  <button onclick="orderDetail('${order.orderNumber}')" class="btn btn-outline-primary mx-auto" ><i class='bx bx-edit mr-1'></i>詳情</button>
+                              </td>
+                          </tr>`
+        })
+
+        return orderHtml;
+    }
+
+    // 撈訂單資料
+    getOrder('button_1')
+
+    // 訂單詳情
+    const orderDetail = (orderNumber) => {
+        let url = '{{route("orderDetail",["orderNumber" => ":orderNumber"])}}';
+        url = url.replace(':orderNumber', orderNumber)
+        location.href = url;
+    }
+
 </script>
 @endsection

@@ -33,4 +33,10 @@ class CategoryModel
     {
         return DB::select("SELECT categoryId , categoryName FROM category");
     }
+
+    // 撈指定分類
+    public static function select_category_where_categoryId_db($categoryId)
+    {
+        return DB::select("SELECT categoryName FROM category WHERE categoryId = '$categoryId'");
+    }
 }
