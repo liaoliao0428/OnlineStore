@@ -184,7 +184,9 @@ Route::prefix('frontend')->group(function () {
 
     // Product
     Route::prefix('product')->group(function () {
-        // 搜尋商品
+        // 主頁搜尋商品關鍵字
+        Route::post('/searchKeyword', [ProductApi::class, 'searchKeyword']);
+        // 商品
         Route::post('/all', [ProductApi::class, 'productAll']);
         // 商品細項
         Route::post('/detail', [ProductApi::class, 'productDetail']);
