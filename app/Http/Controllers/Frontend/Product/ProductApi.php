@@ -18,16 +18,52 @@ class ProductApi extends Controller
     //建構子 middleware設定
     public function __construct()
     {
-        $this->middleware('authCheck');
+        $this->middleware('authCheck')->except('search');
+    }
+
+    // 主頁搜尋商品關鍵字
+    public function searchKeyword(Request $request)
+    {
+        $keyWord = $request->keyWord;
+
+        if(!empty($keyWord)){
+            $originKeyWord[] = [
+                'productName' => $keyWord
+            ];
+            $searchProductName = ProductModel::select_product_productName_where_keyword($keyWord);
+            $searchResult = array_merge($originKeyWord , $searchProductName);
+        }
+
+        // 回傳資料
+        if(!empty($searchResult)){
+            return response()->json(['searchResult' => $searchResult], Response::HTTP_OK);
+        }else{
+            return response()->json(['searchResult' => null], Response::HTTP_OK);
+        }
     }
 
     // 前台取得商品
     public function productAll(Request $request)
     {
+        $searchMode = 1;
         if($request['categoryId']){
-            $products = ProductModel::select_product_with_categoryId_db($request['categoryId']);
-        }else{
-            $products = ProductModel::select_product_db();
+            $searchMode = 2;
+        }elseif($request['keyword']){
+            $searchMode = 3;
+        }
+
+        switch($searchMode){
+            case 1:
+                $products = ProductModel::select_product_db();
+            break;
+
+            case 2:
+                $products = ProductModel::select_product_with_categoryId_db($request['categoryId']);
+            break;
+
+            case 3:
+                $products = ProductModel::select_product_where_keyword($request['keyword']);
+            break;
         }
 
         foreach($products as $index => $product){

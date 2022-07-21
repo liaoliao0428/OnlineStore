@@ -34,20 +34,45 @@ class ProductModel
     // 取得全部商品
     public static function select_product_db()
     {
-        return DB::select("SELECT * FROM product");
+        return DB::select("SELECT * 
+                           FROM product");
     }
 
     // 取得指定分類商品
     public static function select_product_with_categoryId_db($categoryId)
     {
-        return DB::select("SELECT * FROM product WHERE categoryId = '$categoryId' ORDER BY sort ASC");
+        return DB::select("SELECT * 
+                           FROM product 
+                           WHERE categoryId = '$categoryId' 
+                           ORDER BY sort ASC");
     }
 
     // 取得指定商品
     public static function select_product_with_productId_db($productId)
     {
-        return DB::select("SELECT * FROM product WHERE productId = '$productId'");
-    }    
+        return DB::select("SELECT * 
+                           FROM product 
+                           WHERE productId = '$productId'");
+    }
+    
+    // 模糊搜尋商品關鍵字
+    public static function select_product_productName_where_keyword($keyWord)
+    {
+        return DB::select("SELECT productName 
+                           FROM product 
+                           WHERE productName 
+                           LIKE '$keyWord%' 
+                           LIMIT 5");
+    }
+
+    // 模糊搜尋商品關鍵字
+    public static function select_product_where_keyword($keyWord)
+    {
+        return DB::select("SELECT * 
+                           FROM product 
+                           WHERE productName 
+                           LIKE '$keyWord%'");
+    }
 
     // 商品新增寫入
     public static function insert_product_db($product)
